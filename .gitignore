@@ -11,3 +11,16 @@
 /log/*
 !/log/.keep
 /tmp
+
+/public/system
+/coverage/
+/test/tmp
+
+.env*
+
+# if using bower-rails ignore default bower_components path bower.json files
+/vendor/assets/bower_components
+*.bowerrc
+bower.json
+
+.DS_Store
