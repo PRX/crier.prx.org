@@ -1,0 +1,38 @@
+class CreateFeeds < ActiveRecord::Migration
+  def change
+    create_table "feeds" do |t|
+      t.string   "url"
+      t.text     "options"
+      t.datetime "created_at"
+      t.datetime "updated_at"
+      t.string   "title"
+      t.string   "subtitle"
+      t.text     "description"
+      t.text     "summary"
+      t.text     "owners"
+      t.string   "author"
+      t.text     "keywords"
+      t.text     "categories"
+      t.string   "image_url"
+      t.string   "feed_url"
+      t.string   "explicit"
+      t.string   "language"
+      t.string   "copyright"
+      t.string   "managing_editor"
+      t.string   "web_master"
+      t.string   "generator"
+      t.integer  "ttl"
+      t.datetime "published"
+      t.datetime "last_built"
+      t.boolean  "block"
+      t.boolean  "complete"
+      t.string   "new_feed_url"
+      t.string   "update_period"
+      t.integer  "update_frequency"
+      t.string   "feedburner_name"
+      t.string   "hub_url"
+      t.datetime "last_modified"
+      t.datetime "pub_date"
+    end
+  end
+end
