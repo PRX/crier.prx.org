@@ -30,10 +30,9 @@ gem 'feedjira'
 gem 'excon'
 gem 'faraday'
 gem 'shoryuken'
-
 gem 'fastimage'
-
 gem 'dotenv-rails'
+gem 'roar-rails'
 
 group :development, :test do
   # Call 'byebug' anywhere in the code to stop execution and get a debugger console
