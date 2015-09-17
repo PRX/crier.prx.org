@@ -1,10 +1,7 @@
-# each entry, determine if new (e.g. new entry id)
 require 'object_digest'
 require 'addressable/uri'
 
-
 class Feed < ActiveRecord::Base
-
   has_many :responses, class_name: 'FeedResponse'
   has_many :entries, class_name: 'FeedEntry'
 
@@ -15,7 +12,7 @@ class Feed < ActiveRecord::Base
   after_commit :process_feed
 
   def process_feed
-    FeedModifiedWorker.perform_async(self.id)
+    # FeedModifiedWorker.perform_async(self.id)
   end
 
   def sync(force=false)
@@ -65,11 +62,13 @@ class Feed < ActiveRecord::Base
     self.published        = feed.published
     self.subtitle         = feed.itunes_subtitle
     self.summary          = feed.itunes_summary
+    self.title            = feed.title
     self.ttl              = feed.ttl
     self.update_frequency = feed.update_frequency
     self.update_period    = feed.update_period
     self.url              = feed.url
     self.web_master       = feed.web_master
+    save!
   end
 
   def insert_or_update_entry(entry)
@@ -146,5 +145,4 @@ class Feed < ActiveRecord::Base
   def last_successful_response
     responses.where(url: feed_url, status: '200').order(created_at: :desc).first
   end
-
 end
