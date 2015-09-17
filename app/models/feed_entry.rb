@@ -7,7 +7,7 @@ class FeedEntry < ActiveRecord::Base
   serialize :keywords, JSON
 
   def process_feed_entry
-    FeedEntryModifiedWorker.perform_async(self.id)
+    # FeedEntryModifiedWorker.perform_async(self.id)
   end
 
   def self.create_with_entry(feed, entry)
@@ -31,7 +31,7 @@ class FeedEntry < ActiveRecord::Base
   end
 
   def update_feed_entry(entry)
-    self.digest           = FeedEntry.entry_digest(entry)
+    self.digest = FeedEntry.entry_digest(entry)
 
     %w(categories comment_count comment_rss_url comment_url content description entry_id feedburner_orig_enclosure_link feedburner_orig_link published title updated url).each do |at|
       self.try("#{at}=", entry[at.to_sym])
