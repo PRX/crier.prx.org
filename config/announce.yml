@@ -1,0 +1,13 @@
+app_name: crier
+
+publish:
+  feed_entry:
+    - create
+    - update
+    - delete
+
+# subscribe:
+#   feed_entry:
+#     - create
+#     - update
+#     - delete
