@@ -11,7 +11,7 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema.define(version: 20150914213955) do
+ActiveRecord::Schema.define(version: 20150917214657) do
 
   # These are extensions that must be enabled in order to support this database
   enable_extension "plpgsql"
@@ -47,8 +47,10 @@ ActiveRecord::Schema.define(version: 20150914213955) do
     t.string   "comment_count"
     t.string   "feedburner_orig_link"
     t.string   "feedburner_orig_enclosure_link"
+    t.datetime "deleted_at"
   end
 
+  add_index "feed_entries", ["deleted_at"], name: "index_feed_entries_on_deleted_at", using: :btree
   add_index "feed_entries", ["feed_id"], name: "index_feed_entries_on_feed_id", using: :btree
 
   create_table "feed_responses", force: :cascade do |t|
