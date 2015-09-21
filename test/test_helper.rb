@@ -12,15 +12,19 @@ require 'minitest/autorun'
 require 'minitest/spec'
 require 'minitest/pride'
 require 'webmock/minitest'
+require 'announce'
+require 'announce/testing'
 
 WebMock.allow_net_connect! unless use_webmock?
 
 class ActiveSupport::TestCase
   include FactoryGirl::Syntax::Methods
+  include Announce::Testing
 end
 
 class MiniTest::Spec
   include FactoryGirl::Syntax::Methods
+  include Announce::Testing
 end
 
 def json_file(name)
@@ -30,3 +34,6 @@ end
 def test_file(path)
   File.read( File.dirname(__FILE__) + path)
 end
+
+include Announce::Testing
+reset_announce
