@@ -1,13 +1,32 @@
 class FeedEntry < ActiveRecord::Base
-  belongs_to :feed
+  include Announce::Publisher
 
-  after_commit :process_feed_entry
+  acts_as_paranoid
+
+  belongs_to :feed
 
   serialize :categories, JSON
   serialize :keywords, JSON
 
-  def process_feed_entry
-    # FeedEntryModifiedWorker.perform_async(self.id)
+  after_commit :feed_entry_created, on: :create
+  after_commit :feed_entry_updated, on: :update
+  before_destroy :feed_entry_deleted
+
+  def feed_entry_created
+    announce_entry(:create)
+  end
+
+  def feed_entry_updated
+    announce_entry(:update)
+  end
+
+  def feed_entry_deleted
+    announce_entry(:delete)
+  end
+
+  def announce_entry(action)
+    entry = FeedEntryRepresenter.new(self).to_json
+    announce(:feed_entry, action, entry)
   end
 
   def self.create_with_entry(feed, entry)
@@ -58,6 +77,9 @@ class FeedEntry < ActiveRecord::Base
   end
 
   def seconds_for_duration(duration)
-    duration.split(':').reverse.inject([0,0]){|info, i| sum = (i.to_i * 60**info[0]) + info[1]; [(info[0]+1), sum] }[1]
+    duration.split(':').reverse.inject([0,0]) do |info, i|
+      sum = (i.to_i * 60**info[0]) + info[1]
+      [(info[0]+1), sum]
+    end[1]
   end
 end

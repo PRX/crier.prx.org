@@ -9,10 +9,9 @@ class Feed < ActiveRecord::Base
   serialize :keywords, JSON
   serialize :owners, JSON
 
-  after_commit :process_feed
+  after_commit :feed_updated
 
-  def process_feed
-    # FeedModifiedWorker.perform_async(self.id)
+  def feed_updated
   end
 
   def sync(force=false)
