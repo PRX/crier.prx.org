@@ -1,16 +1,17 @@
 class FeedRepresenter < BaseRepresenter
   link :self do
-    feed_url represented
+    api_feed_url represented
   end
 
   link 'prx:entries' do
-    feed_entries_url represented
+    api_feed_entries_url represented
   end
 
   property :feed_url
   property :new_feed_url
   property :url
   property :image_url
+  property :thumb_url
   property :hub_url
 
   property :title
