@@ -39,34 +39,33 @@ class Feed < ActiveRecord::Base
   end
 
   def update_feed(feed)
-    self.author           = feed.itunes_author
-    self.block            = (feed.itunes_block == 'yes')
-    self.categories       = parse_categories(feed)
-    self.complete         = (feed.itunes_complete == 'yes')
-    self.copyright        = feed.copyright || feed.media_copyright
-    self.description      = feed.description
-    self.explicit         = (feed.itunes_explicit && feed.itunes_explicit != 'no')
-    self.feedburner_name  = feed.feedburner_name
-    self.generator        = feed.generator
-    self.hub_url          = Array(feed.hubs).first
-    self.image_url        = feed.itunes_image || feed.image.try(:url)
-    self.keywords         = parse_keywords(feed)
-    self.language         = feed.language
-    self.last_built       = feed.last_built
-    self.last_modified    = feed.last_modified
-    self.managing_editor  = feed.managing_editor
-    self.new_feed_url     = feed.itunes_new_feed_url
-    self.owners           = feed.itunes_owners.collect{|o| {name: o.name, email: o.email}}
-    self.pub_date         = feed.pub_date
-    self.published        = feed.published
-    self.subtitle         = feed.itunes_subtitle
-    self.summary          = feed.itunes_summary
-    self.title            = feed.title
-    self.ttl              = feed.ttl
-    self.update_frequency = feed.update_frequency
-    self.update_period    = feed.update_period
-    self.url              = feed.url
-    self.web_master       = feed.web_master
+
+    %w( copyright description feedburner_name generator language last_built
+      last_modified managing_editor pub_date published title ttl
+      update_frequency update_period url web_master
+    ).each do |at|
+      self.try("#{at}=", entry[at.to_sym])
+    end
+
+    { itunes_author: :author, itunes_image: :image_url,
+      itunes_subtitle: :subtitle, itunes_summary: :summary,
+      itunes_new_feed_url: :new_feed_url
+    }.each do |k,v|
+      self.try("#{v}=", entry[k])
+    end
+
+    self.block      = (feed[:itunes_block] == 'yes')
+    self.categories = parse_categories(feed)
+    self.complete   = (feed[:itunes_complete] == 'yes')
+    self.copyright  ||= feed[:media_copyright]
+    self.explicit   = (feed[:itunes_explicit] && feed[:itunes_explicit] != 'no')
+    self.hub_url    = Array(feed.hubs).first
+    self.thumb_url  = feed.try(:image).try(:url)
+    self.keywords   = parse_keywords(feed)
+    self.owners     = (feed[:itunes_owners] || []).collect { |o|
+      { name: o.name, email: o.email }
+    }
+
     save!
   end
 
