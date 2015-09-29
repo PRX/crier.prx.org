@@ -9,12 +9,12 @@ class FeedEntryRepresenter < BaseRepresenter
   end
 
   link :self do
-    api_feed_entry_url represented.feed, represented
+    api_feed_entry_path represented.feed, represented
   end
 
   link 'prx:feed' do
     {
-      href: api_feed_url(represented.feed),
+      href: api_feed_path(represented.feed),
       title: represented.feed.title
     } if represented.feed
   end
@@ -41,8 +41,6 @@ class FeedEntryRepresenter < BaseRepresenter
   property :duration
 
   property :explicit
-  property :keywords
-  property :categories
   property :is_closed_captioned
   property :position
   property :block
@@ -53,4 +51,7 @@ class FeedEntryRepresenter < BaseRepresenter
 
   property :published
   property :updated
+
+  collection :keywords
+  collection :categories
 end
