@@ -1,16 +1,17 @@
 class FeedRepresenter < BaseRepresenter
   link :self do
-    feed_url represented
+    api_feed_path represented
   end
 
   link 'prx:entries' do
-    feed_entries_url represented
+    api_feed_entries_path represented
   end
 
   property :feed_url
   property :new_feed_url
   property :url
   property :image_url
+  property :thumb_url
   property :hub_url
 
   property :title
@@ -23,8 +24,6 @@ class FeedRepresenter < BaseRepresenter
   property :managing_editor
   property :web_master
 
-  property :keywords
-  property :categories
   property :explicit
   property :language
   property :copyright
@@ -41,4 +40,7 @@ class FeedRepresenter < BaseRepresenter
   property :last_built
   property :last_modified
   property :pub_date
+
+  collection :keywords
+  collection :categories
 end

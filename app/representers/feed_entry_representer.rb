@@ -1,14 +1,24 @@
 class FeedEntryRepresenter < BaseRepresenter
+
+  curies do
+    [{
+      name: :prx,
+      href: "http://#{prx_meta_host}/relation/{rel}",
+      templated: true
+    }]
+  end
+
   link :self do
-    feed_entry_url represented.feed, represented
+    api_feed_entry_path represented.feed, represented
   end
 
   link 'prx:feed' do
     {
-      href: feed_url(represented.feed),
+      href: api_feed_path(represented.feed),
       title: represented.feed.title
     } if represented.feed
   end
+  embed :feed, as: 'prx:feed', class: Feed, decorator: FeedRepresenter
 
   property :entry_id, as: :guid
 
@@ -31,8 +41,6 @@ class FeedEntryRepresenter < BaseRepresenter
   property :duration
 
   property :explicit
-  property :keywords
-  property :categories
   property :is_closed_captioned
   property :position
   property :block
@@ -43,4 +51,7 @@ class FeedEntryRepresenter < BaseRepresenter
 
   property :published
   property :updated
+
+  collection :keywords
+  collection :categories
 end

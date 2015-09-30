@@ -1,8 +1,10 @@
 Rails.application.routes.draw do
 
-  scope ':api_version', api_version: 'v1' do
-    resources :feeds do
-      resources :entries, controller: 'feed_entries'
+  namespace :api do
+    scope ':api_version', api_version: 'v1' do
+      resources :feeds do
+        resources :entries, controller: 'feed_entries'
+      end
     end
   end
 

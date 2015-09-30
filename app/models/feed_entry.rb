@@ -52,11 +52,17 @@ class FeedEntry < ActiveRecord::Base
   def update_feed_entry(entry)
     self.digest = FeedEntry.entry_digest(entry)
 
-    %w(categories comment_count comment_rss_url comment_url content description entry_id feedburner_orig_enclosure_link feedburner_orig_link published title updated url).each do |at|
+    %w( categories comment_count comment_rss_url comment_url content description
+      entry_id feedburner_orig_enclosure_link feedburner_orig_link published
+      title updated url
+    ).each do |at|
       self.try("#{at}=", entry[at.to_sym])
     end
 
-    {itunes_explicit: :explicit, itunes_image: :image_url, itunes_order: :position, itunes_subtitle: :subtitle, itunes_summary: :summary}.each do |k,v|
+    { itunes_explicit: :explicit, itunes_image: :image_url,
+      itunes_order: :position, itunes_subtitle: :subtitle,
+      itunes_summary: :summary
+    }.each do |k,v|
       self.try("#{v}=", entry[k])
     end
 
