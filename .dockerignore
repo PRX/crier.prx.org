@@ -6,9 +6,14 @@ log/*
 test/
 coverage/
 .git
+.gitignore
 .bundle
-.env
-.powenv
+.env*
+.powder
+build.sh
+docker-compose.yml
+Dockerfile
+env-example
 
 #
 # OS X
