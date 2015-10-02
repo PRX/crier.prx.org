@@ -53,10 +53,10 @@ class FeedEntry < ActiveRecord::Base
     self.digest = FeedEntry.entry_digest(entry)
 
     %w( categories comment_count comment_rss_url comment_url content description
-      entry_id feedburner_orig_enclosure_link feedburner_orig_link published
-      title updated url
+      entry_id feedburner_orig_enclosure_link feedburner_orig_link is_perma_link
+      published title updated url
     ).each do |at|
-      self.try("#{at}=", entry[at.to_sym])
+      self.try("#{at}=", entry[at])
     end
 
     { itunes_explicit: :explicit, itunes_image: :image_url,
