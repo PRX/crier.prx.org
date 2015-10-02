@@ -39,7 +39,7 @@ RUN apt-get install -y git
 ### Install Ruby
 
 # ruby 2.2
-RUN crier_scripts/ruby2.2.sh
+RUN /crier_scripts/ruby2.2.sh
 
 # nokogiri dependency
 RUN apt-get install -y libxml2-dev libxslt1-dev
