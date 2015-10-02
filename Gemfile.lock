@@ -250,6 +250,8 @@ GEM
     webmock (1.21.0)
       addressable (>= 2.3.6)
       crack (>= 0.3.2)
+    xmlrpc-rack_server (0.0.2)
+      rack
 
 PLATFORMS
   ruby
@@ -287,6 +289,7 @@ DEPENDENCIES
   unicorn
   web-console (~> 2.0)
   webmock
+  xmlrpc-rack_server (~> 0.0.2)
 
 BUNDLED WITH
    1.10.6

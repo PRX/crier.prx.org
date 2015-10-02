@@ -27,6 +27,9 @@ gem 'addressable'
 # for rss feeds
 gem 'feedjira'
 
+# for pings
+gem 'xmlrpc-rack_server', '~> 0.0.2'
+
 gem 'excon'
 gem 'faraday'
 gem 'fastimage'
