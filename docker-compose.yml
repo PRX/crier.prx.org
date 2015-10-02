@@ -1,0 +1,10 @@
+worker:
+  build: .
+  env_file: .env.compose
+  links:
+    - db
+db:
+  image: postgres
+  env_file: .env.compose
+  ports:
+    - "5432:5432"
