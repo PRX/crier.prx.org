@@ -1,5 +1,6 @@
 require 'shoryuken'
 require 'shoryuken/extensions/active_job_adapter'
+require 'say_when/poller/celluloid_poller'
 
 Shoryuken.default_worker_options =  {
   'queue'                   => "#{Rails.env}_crier_default",
@@ -20,4 +21,8 @@ Shoryuken.configure_client do |config|
     config_file = File.join(Rails.root, 'config', 'shoryuken.yml')
     Shoryuken::EnvironmentLoader.load(config_file: config_file)
   end
+end
+
+Shoryuken.on_start do
+  SayWhen::Poller::CelluloidPoller.supervise_as :say_when, 5
 end
