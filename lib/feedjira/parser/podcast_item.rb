@@ -12,6 +12,7 @@ module Feedjira
       element :comments
       element :enclosure, class: PodcastItemEnclosure
       element :guid, as: :entry_id
+      element :guid, value: :isPermaLink, as: :is_perma_link
       element :pubDate, as: :published
 
       element :"itunes:author", as: :itunes_author

@@ -11,7 +11,7 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema.define(version: 20150923134938) do
+ActiveRecord::Schema.define(version: 20151002193356) do
 
   # These are extensions that must be enabled in order to support this database
   enable_extension "plpgsql"
@@ -48,6 +48,7 @@ ActiveRecord::Schema.define(version: 20150923134938) do
     t.string   "feedburner_orig_link"
     t.string   "feedburner_orig_enclosure_link"
     t.datetime "deleted_at"
+    t.boolean  "is_perma_link"
   end
 
   add_index "feed_entries", ["deleted_at"], name: "index_feed_entries_on_deleted_at", using: :btree

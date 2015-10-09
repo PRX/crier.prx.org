@@ -21,6 +21,7 @@ class FeedEntryRepresenter < BaseRepresenter
   embed :feed, as: 'prx:feed', class: Feed, decorator: FeedRepresenter
 
   property :entry_id, as: :guid
+  property :is_perma_link
 
   property :url
   property :feedburner_orig_link
