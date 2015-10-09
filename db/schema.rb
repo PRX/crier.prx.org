@@ -11,7 +11,7 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema.define(version: 20151002193356) do
+ActiveRecord::Schema.define(version: 20151009131626) do
 
   # These are extensions that must be enabled in order to support this database
   enable_extension "plpgsql"
@@ -103,6 +103,9 @@ ActiveRecord::Schema.define(version: 20151002193356) do
     t.datetime "last_modified"
     t.datetime "pub_date"
     t.string   "thumb_url"
+    t.datetime "deleted_at"
   end
+
+  add_index "feeds", ["deleted_at"], name: "index_feeds_on_deleted_at", using: :btree
 
 end

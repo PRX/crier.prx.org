@@ -99,5 +99,4 @@ describe Feed do
     response.wont_be_nil
     feed.last_successful_response.must_equal response
   end
-
 end

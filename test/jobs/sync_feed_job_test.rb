@@ -10,6 +10,6 @@ describe SyncFeedJob do
   let(:feed) { Feed.create!(feed_url: 'http://feeds.99percentinvisible.org/99percentinvisible') }
 
   it 'sync feed by id' do
-    SyncFeedJob.new.perform(feed.id)
+    SyncFeedJob.new.perform(feed, true)
   end
 end
