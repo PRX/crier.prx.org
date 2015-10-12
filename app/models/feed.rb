@@ -2,6 +2,8 @@ require 'object_digest'
 require 'addressable/uri'
 
 class Feed < ActiveRecord::Base
+  acts_as_paranoid
+
   has_many :responses, class_name: 'FeedResponse'
   has_many :entries, class_name: 'FeedEntry'
 
@@ -10,7 +12,16 @@ class Feed < ActiveRecord::Base
   serialize :keywords, JSON
   serialize :owners, JSON
 
+  after_create :schedule_sync
   after_commit :feed_updated
+
+  def schedule_sync
+    SyncFeedJob.set(wait: sync_interval).perform_later(self, true)
+  end
+
+  def sync_interval
+    10.minutes
+  end
 
   def feed_updated
   end
@@ -79,11 +90,11 @@ class Feed < ActiveRecord::Base
 
   def find_entry(entry)
     if !entry.entry_id.blank?
-      entries.where(entry_id: entry.entry_id)
+      entries.with_deleted.where(entry_id: entry.entry_id)
     elsif !entry.url.blank?
-      entries.where(url: entry.url)
+      entries.with_deleted.where(url: entry.url)
     else
-      entries.where(digest: FeedEntry.entry_digest(entry))
+      entries.with_deleted.where(digest: FeedEntry.entry_digest(entry))
     end.first
   end
 
@@ -137,7 +148,8 @@ class Feed < ActiveRecord::Base
   end
 
   def connection
-    client = Faraday.new("#{uri.scheme}://#{uri.host}:#{uri.port}") {|stack| stack.adapter :excon }
+    conn_uri = "#{uri.scheme}://#{uri.host}:#{uri.port}"
+    client ||= Faraday.new(conn_uri) { |stack| stack.adapter :excon }
   end
 
   def last_successful_response

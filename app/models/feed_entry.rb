@@ -44,6 +44,7 @@ class FeedEntry < ActiveRecord::Base
   end
 
   def update_with_entry(entry)
+    restore if is_deleted?
     return unless is_changed?(entry)
     update_feed_entry(entry)
     save
