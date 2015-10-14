@@ -31,10 +31,8 @@ class Feed < ActiveRecord::Base
 
     feed = Feedjira::Feed.parse(response.body)
     update_feed(feed)
-
-    feed.entries.each do |entry|
-      insert_or_update_entry(entry)
-    end
+    keepers = feed.entries.map { |e| insert_or_update_entry(e).id }
+    entries.where('id not in (?)', keepers).each {|e| e.destroy }
   end
 
   def parse_categories(feed)
@@ -84,8 +82,9 @@ class Feed < ActiveRecord::Base
     if current = find_entry(entry)
       current.update_with_entry(entry)
     else
-      FeedEntry.create_with_entry(self, entry)
+      current = FeedEntry.create_with_entry(self, entry)
     end
+    current
   end
 
   def find_entry(entry)
