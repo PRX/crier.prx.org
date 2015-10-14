@@ -30,9 +30,10 @@ class FeedEntry < ActiveRecord::Base
   end
 
   def self.create_with_entry(feed, entry)
-    entry = new.update_feed_entry(entry)
-    entry.feed = feed
-    entry.save
+    new.update_attributes_with_entry(entry).tap do |fe|
+      fe.feed = feed
+      fe.save
+    end
   end
 
   def self.entry_digest(entry)
@@ -44,13 +45,14 @@ class FeedEntry < ActiveRecord::Base
   end
 
   def update_with_entry(entry)
-    restore if is_deleted?
-    return unless is_changed?(entry)
-    update_feed_entry(entry)
-    save
+    restore if deleted?
+    if is_changed?(entry)
+      update_attributes_with_entry(entry)
+      save
+    end
   end
 
-  def update_feed_entry(entry)
+  def update_attributes_with_entry(entry)
     self.digest = FeedEntry.entry_digest(entry)
 
     %w( categories comment_count comment_rss_url comment_url content description
