@@ -7,6 +7,8 @@ class FeedEntry < ActiveRecord::Base
 
   serialize :categories, JSON
   serialize :keywords, JSON
+  serialize :author, JSON
+  serialize :enclosure, JSON
 
   after_commit :feed_entry_created, on: :create
   after_commit :feed_entry_updated, on: :update
@@ -69,18 +71,15 @@ class FeedEntry < ActiveRecord::Base
       self.try("#{v}=", entry[k])
     end
 
-    self.author              = entry[:itunes_author] || entry[:author] || entry[:creator]
     self.block               = (entry[:itunes_block] == 'yes')
     self.duration            = seconds_for_duration(entry[:itunes_duration] || entry[:duration])
     self.is_closed_captioned = (entry[:itunes_is_closed_captioned] == 'yes')
     self.keywords            = (entry[:itunes_keywords] || '').split(',').map(&:strip)
 
-    # TODO: do something with media_groups/media_contents if no enclosure
-    if entry[:enclosure]
-      self.enclosure_length = entry[:enclosure].length
-      self.enclosure_type   = entry[:enclosure].type
-      self.enclosure_url    = entry[:enclosure].url
-    end
+    author_attr = entry[:itunes_author] || entry[:author] || entry[:creator]
+    self.author = Person.new(author_attr) if author_attr
+
+    self.enclosure = Enclosure.new(entry[:enclosure]) if entry[:enclosure]
 
     self
   end
