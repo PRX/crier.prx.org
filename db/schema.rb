@@ -11,7 +11,7 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema.define(version: 20151009131626) do
+ActiveRecord::Schema.define(version: 20151016150558) do
 
   # These are extensions that must be enabled in order to support this database
   enable_extension "plpgsql"
@@ -29,9 +29,6 @@ ActiveRecord::Schema.define(version: 20151009131626) do
     t.datetime "published"
     t.datetime "updated"
     t.string   "image_url"
-    t.string   "enclosure_length"
-    t.string   "enclosure_type"
-    t.string   "enclosure_url"
     t.integer  "duration"
     t.string   "explicit"
     t.text     "keywords"
@@ -49,6 +46,7 @@ ActiveRecord::Schema.define(version: 20151009131626) do
     t.string   "feedburner_orig_enclosure_link"
     t.datetime "deleted_at"
     t.boolean  "is_perma_link"
+    t.text     "enclosure"
   end
 
   add_index "feed_entries", ["deleted_at"], name: "index_feed_entries_on_deleted_at", using: :btree
@@ -107,5 +105,38 @@ ActiveRecord::Schema.define(version: 20151009131626) do
   end
 
   add_index "feeds", ["deleted_at"], name: "index_feeds_on_deleted_at", using: :btree
+
+  create_table "say_when_job_executions", force: :cascade do |t|
+    t.integer  "job_id"
+    t.string   "status"
+    t.text     "result"
+    t.datetime "start_at"
+    t.datetime "end_at"
+  end
+
+  add_index "say_when_job_executions", ["job_id"], name: "index_say_when_job_executions_on_job_id", using: :btree
+  add_index "say_when_job_executions", ["status", "start_at", "end_at"], name: "index_say_when_job_executions_on_status_and_start_at_and_end_at", using: :btree
+
+  create_table "say_when_jobs", force: :cascade do |t|
+    t.string   "group"
+    t.string   "name"
+    t.string   "status"
+    t.string   "trigger_strategy"
+    t.text     "trigger_options"
+    t.datetime "last_fire_at"
+    t.datetime "next_fire_at"
+    t.datetime "start_at"
+    t.datetime "end_at"
+    t.string   "job_class"
+    t.string   "job_method"
+    t.text     "data"
+    t.string   "scheduled_type"
+    t.integer  "scheduled_id"
+    t.datetime "created_at",       null: false
+    t.datetime "updated_at",       null: false
+  end
+
+  add_index "say_when_jobs", ["next_fire_at", "status"], name: "index_say_when_jobs_on_next_fire_at_and_status", using: :btree
+  add_index "say_when_jobs", ["scheduled_type", "scheduled_id"], name: "index_say_when_jobs_on_scheduled_type_and_scheduled_id", using: :btree
 
 end
