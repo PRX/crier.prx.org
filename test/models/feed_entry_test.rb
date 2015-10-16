@@ -19,7 +19,7 @@ describe FeedEntry do
     entry.title.must_equal '132- Castle on the Park'
     entry.explicit.must_equal 'no'
     entry.duration.must_equal 1126
-    entry.enclosure_url.must_equal 'http://www.podtrac.com/pts/redirect.mp3/media.blubrry.com/99percentinvisible/cdn.99percentinvisible.org/wp-content/uploads/132-Castle-on-the-Park.mp3'
+    entry.enclosure['url'].must_equal 'http://www.podtrac.com/pts/redirect.mp3/media.blubrry.com/99percentinvisible/cdn.99percentinvisible.org/wp-content/uploads/132-Castle-on-the-Park.mp3'
   end
 
   it 'calculates a digest from an rss entry' do
