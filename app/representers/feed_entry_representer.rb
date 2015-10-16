@@ -35,9 +35,7 @@ class FeedEntryRepresenter < BaseRepresenter
   property :summary
   property :description
 
-  property :enclosure_length
-  property :enclosure_type
-  property :enclosure_url
+  property :enclosure
   property :feedburner_orig_enclosure_link
   property :duration
 
