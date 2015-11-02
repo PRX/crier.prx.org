@@ -19,7 +19,16 @@ describe FeedEntry do
     entry.title.must_equal '132- Castle on the Park'
     entry.explicit.must_equal 'no'
     entry.duration.must_equal 1126
-    entry.enclosure['url'].must_equal 'http://www.podtrac.com/pts/redirect.mp3/media.blubrry.com/99percentinvisible/cdn.99percentinvisible.org/wp-content/uploads/132-Castle-on-the-Park.mp3'
+    entry.enclosure.url.must_equal 'http://www.podtrac.com/pts/redirect.mp3/media.blubrry.com/99percentinvisible/cdn.99percentinvisible.org/wp-content/uploads/132-Castle-on-the-Park.mp3'
+  end
+
+  it 'can be created from an rss entry with media content' do
+    rss_feed = Feedjira::Feed.parse(test_file('/fixtures/serialpodcast.xml'))
+    rss_feed_entry = rss_feed.entries.first
+    entry = FeedEntry.create_with_entry(feed, rss_feed_entry)
+    entry.contents.size.must_equal 2
+    entry.contents.first.position.must_equal 1
+    entry.contents.last.position.must_equal 2
   end
 
   it 'calculates a digest from an rss entry' do
