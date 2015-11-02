@@ -10,7 +10,11 @@ class Feed < ActiveRecord::Base
   serialize :options, JSON
   serialize :categories, JSON
   serialize :keywords, JSON
+
   serialize :owners, JSON
+  serialize :author, JSON
+  serialize :web_master, JSON
+  serialize :managing_editor, JSON
 
   after_create :schedule_sync
   after_commit :feed_updated
@@ -50,18 +54,24 @@ class Feed < ActiveRecord::Base
 
   def update_feed(feed)
     %w( copyright description feedburner_name generator language last_built
-      last_modified managing_editor pub_date published title ttl
+      last_modified pub_date published title ttl
       update_frequency update_period url web_master
     ).each do |at|
       self.try("#{at}=", feed.try(at))
     end
 
-    { itunes_author: :author, itunes_image: :image_url,
+    { itunes_image: :image_url,
       itunes_subtitle: :subtitle, itunes_summary: :summary,
       itunes_new_feed_url: :new_feed_url
     }.each do |k,v|
       self.try("#{v}=", feed.try(k))
     end
+
+    self.web_master = Person.new(feed.web_master) if feed.web_master
+    self.managing_editor = Person.new(feed.managing_editor) if feed.managing_editor
+    self.author = Person.new(feed.itunes_author) if feed.itunes_author
+    owners_list = Array(feed.itunes_owners)
+    self.owners = owners_list.map { |o| Person.new(name: o.name, email: o.email) } unless owners_list.blank?
 
     self.block      = (feed.itunes_block == 'yes')
     self.categories = parse_categories(feed)
@@ -71,9 +81,6 @@ class Feed < ActiveRecord::Base
     self.hub_url    = Array(feed.hubs).first
     self.thumb_url  = feed.image.try(:url)
     self.keywords   = parse_keywords(feed)
-    self.owners     = (feed.itunes_owners || []).collect { |o|
-      { name: o.name, email: o.email }
-    }
 
     save!
   end
