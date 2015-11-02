@@ -1,23 +1,17 @@
-class Enclosure
-  attr_accessor :length, :type, :url
-
-  def initialize(arg)
-    if arg.is_a?(Hash)
-      self.length = arg[:length].to_i
-      self.type = arg[:type]
-      self.url = arg[:url]
-    elsif arg.respond_to?(:length)
-      self.length = arg.length.to_i
-      self.type = arg.type
-      self.url = arg.url
-    end
+class Enclosure < MediaResource
+  def self.build_from_enclosure(enclosure)
+    new.update_attributes_with_enclosure(enclosure)
   end
 
-  def as_json(*args)
-    {
-      length: length,
-      type: type,
-      url: url
-    }
+  def update_with_enclosure(enclosure)
+    update_attributes_with_enclosure(enclosure)
+    save
+  end
+
+  def update_attributes_with_enclosure(enclosure)
+    self.file_size = enclosure.length.to_i
+    self.mime_type = enclosure.type
+    self.url       = enclosure.url
+    self
   end
 end

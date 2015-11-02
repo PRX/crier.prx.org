@@ -4,11 +4,12 @@ class FeedEntry < ActiveRecord::Base
   acts_as_paranoid
 
   belongs_to :feed
+  has_many :contents, -> { order("position ASC") }
+  has_one :enclosure
 
   serialize :categories, JSON
   serialize :keywords, JSON
   serialize :author, JSON
-  serialize :enclosure, JSON
 
   after_commit :feed_entry_created, on: :create
   after_commit :feed_entry_updated, on: :update
@@ -79,7 +80,15 @@ class FeedEntry < ActiveRecord::Base
     author_attr = entry[:itunes_author] || entry[:author] || entry[:creator]
     self.author = Person.new(author_attr) if author_attr
 
-    self.enclosure = Enclosure.new(entry[:enclosure]) if entry[:enclosure]
+    if entry[:enclosure]
+      self.enclosure = Enclosure.build_from_enclosure(entry[:enclosure])
+    end
+
+    if !entry[:media_contents].blank?
+      entry[:media_contents].each do |mc|
+        self.contents << Content.build_from_content(mc)
+      end
+    end
 
     self
   end

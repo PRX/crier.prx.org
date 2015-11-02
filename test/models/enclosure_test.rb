@@ -2,26 +2,25 @@ require 'test_helper'
 
 describe Enclosure do
 
-  let(:enclosure) { Enclosure.new(url: 'u', length: 0, type: 't') }
+  let(:feed_entry) { build(:feed_entry) }
+  let(:enclosure) { Enclosure.new(url: 'u', file_size: 10, mime_type: 'mt') }
+  let(:rss_enclosure) {
+    rss_feed = Feedjira::Feed.parse(test_file('/fixtures/serialpodcast.xml'))
+    rss_feed_entry = rss_feed.entries.first
+    rss_feed_entry.enclosure
+  }
 
-  it 'can be constructed by a hash' do
-    e = Enclosure.new(url: 'u', length: 0, type: 't')
-    e.url.must_equal 'u'
-    e.length.must_equal 0
-    e.type.must_equal 't'
+  it 'can be constructed from feed enclosure' do
+    e = Enclosure.build_from_enclosure(rss_enclosure)
+    e.url.must_equal 'http://dts.podtrac.com/redirect.mp3/files.serialpodcast.org/sites/default/files/podcast/1445350094/serial-s01-e12.mp3'
+    e.file_size.must_equal 27485957
+    e.mime_type.must_equal 'audio/mpeg'
   end
 
-  it 'can be constructed from an object' do
-    e = Enclosure.new(enclosure)
-    e.url.must_equal 'u'
-    e.length.must_equal 0
-    e.type.must_equal 't'
-  end
-
-  it 'can turn into a hash' do
-    e = enclosure.as_json
-    e[:url].must_equal 'u'
-    e[:length].must_equal 0
-    e[:type].must_equal 't'
+  it 'can be updated' do
+    enclosure.update_with_enclosure(rss_enclosure)
+    enclosure.url.must_equal 'http://dts.podtrac.com/redirect.mp3/files.serialpodcast.org/sites/default/files/podcast/1445350094/serial-s01-e12.mp3'
+    enclosure.file_size.must_equal 27485957
+    enclosure.mime_type.must_equal 'audio/mpeg'
   end
 end
