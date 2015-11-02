@@ -14,12 +14,4 @@ class BaseRepresenter < Roar::Decorator
 
     property(name, options)
   end
-
-  def self.embeds(name, options={})
-    options[:embedded] = true
-    options[:writeable] = false
-    options[:if] ||= ->(_a) { id } unless options[:zoom] == :always
-
-    collection(name, options)
-  end
 end

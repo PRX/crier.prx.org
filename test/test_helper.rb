@@ -1,3 +1,11 @@
+require 'simplecov'
+SimpleCov.start 'rails'
+
+if ENV['TRAVIS']
+  require 'coveralls'
+  Coveralls.wear!
+end
+
 def use_webmock?
   ENV['PMP_IMPORTER_WEBMOCK'].nil? || (ENV['PMP_IMPORTER_WEBMOCK'] == 'true')
 end
@@ -14,17 +22,20 @@ require 'minitest/pride'
 require 'webmock/minitest'
 require 'announce'
 require 'announce/testing'
+require 'active_job/test_helper'
 
 WebMock.allow_net_connect! unless use_webmock?
 
 class ActiveSupport::TestCase
   include FactoryGirl::Syntax::Methods
   include Announce::Testing
+  include ActiveJob::TestHelper
 end
 
 class MiniTest::Spec
   include FactoryGirl::Syntax::Methods
   include Announce::Testing
+  include ActiveJob::TestHelper
 end
 
 def json_file(name)

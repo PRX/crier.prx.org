@@ -12,4 +12,14 @@ describe SyncFeedJob do
   it 'sync feed by id' do
     SyncFeedJob.new.perform(feed, true)
   end
+
+  it 'does not schedule jobs if unschedule false' do
+    SyncFeedJob.new.perform(feed, false)
+  end
+
+  it 'does not schedule jobs with a deleted feed' do
+    feed.stub(:deleted?, true) do
+      SyncFeedJob.new.perform(feed, true)
+    end
+  end
 end

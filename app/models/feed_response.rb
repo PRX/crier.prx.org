@@ -43,7 +43,7 @@ class FeedResponse < ActiveRecord::Base
   end
 
   def headers
-    self.response_headers
+    response_headers
   end
 
   def now
