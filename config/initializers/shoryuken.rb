@@ -19,5 +19,6 @@ Shoryuken.configure_client do |config|
   unless Rails.env.test?
     config_file = File.join(Rails.root, 'config', 'shoryuken.yml')
     Shoryuken::EnvironmentLoader.load(config_file: config_file)
+    Shoryuken::Client.account_id = Shoryuken.options[:aws][:account_id] || ENV['AWS_ACCOUNT_ID']
   end
 end
