@@ -35,7 +35,7 @@ class FeedEntryRepresenter < BaseRepresenter
   property :summary
   property :description
 
-  property :enclosure
+  property :enclosure, class: Enclosure, decorator: EnclosureRepresenter
   property :feedburner_orig_enclosure_link
   property :duration
 
@@ -51,6 +51,7 @@ class FeedEntryRepresenter < BaseRepresenter
   property :published
   property :updated
 
+  collection :contents, class: Content, decorator: ContentRepresenter
   collection :keywords
   collection :categories
 end
