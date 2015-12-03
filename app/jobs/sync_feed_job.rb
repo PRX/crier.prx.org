@@ -12,7 +12,7 @@ class SyncFeedJob < ActiveJob::Base
         end
       ensure
         if reschedule && feed
-          SyncFeedJob.set(wait: feed.sync_interval).perform_later(feed, true)
+          feed.schedule_sync
         end
       end
     end
