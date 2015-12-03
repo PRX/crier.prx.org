@@ -99,4 +99,47 @@ describe Feed do
     feed = feed_response.feed
     feed.last_successful_response.must_equal response
   end
+
+  it 'has an interval based on retrieve_delay' do
+    feed.sync_interval.must_equal Feed::DEFAULT_SYNC_INTERVAL
+
+    feed.retrieve_delay = 3600
+    feed.sync_interval.must_equal Feed::MAX_SYNC_INTERVAL
+
+    feed.retrieve_delay = 360
+    feed.sync_interval.must_equal 360
+  end
+
+  describe 'should retrieve' do
+
+    let(:last_response) {
+      last_response = Minitest::Mock.new
+      last_response.expect(:date, 1.week.ago)
+      last_response.expect(:nil?, false)
+      last_response
+    }
+
+    it 'should force retrieve for no response' do
+      feed.should_retrieve?(nil).must_equal true
+    end
+
+    it 'should force retrieve when always_retrieve' do
+      feed.always_retrieve = true
+      feed.should_retrieve?(last_response).must_equal true
+    end
+
+    it 'should force retrieve when past delay' do
+      feed.retrieve_delay = 24*60*60
+      feed.should_retrieve?(last_response).must_equal true
+    end
+
+    it 'should not retrieve when witihn delay' do
+      feed.retrieve_delay = 24*60*60*8
+      feed.should_retrieve?(last_response).must_equal false
+    end
+
+    it 'should not force retrieve for no delay' do
+      feed.should_retrieve?(last_response).must_equal false
+    end
+  end
 end

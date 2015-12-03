@@ -19,28 +19,35 @@ class Feed < ActiveRecord::Base
   after_create :schedule_sync
   after_commit :feed_updated
 
+  DEFAULT_SYNC_INTERVAL = 10 * 60 # 10 minutes
+  MAX_SYNC_INTERVAL = 15 * 60     # 15 minutes
+
   def schedule_sync
     SyncFeedJob.set(wait: sync_interval).perform_later(self, true)
   end
 
   def sync_interval
-    10.minutes
+    if retrieve_delay.to_i > 0
+      [retrieve_delay, MAX_SYNC_INTERVAL].min
+    else
+      DEFAULT_SYNC_INTERVAL
+    end
   end
 
   def feed_updated
   end
 
-  def sync(force=false)
+  def sync(force = false)
     return unless response = updated_response(force)
 
     feed = Feedjira::Feed.parse(response.body)
     update_feed(feed)
     keepers = feed.entries.map { |e| insert_or_update_entry(e).id }
-    entries.where('id not in (?)', keepers).each {|e| e.destroy }
+    entries.where('id not in (?)', keepers).each { |e| e.destroy }
   end
 
   def parse_categories(feed)
-    icat = Array(feed.itunes_categories).map(&:strip).select{|c| !c.blank?}
+    icat = Array(feed.itunes_categories).map(&:strip).select{ |c| !c.blank? }
     mcat = Array(feed.media_categories)
     rcat = Array(feed.categories)
     (icat + mcat + rcat).compact.uniq
@@ -109,13 +116,25 @@ class Feed < ActiveRecord::Base
 
     last_response = last_successful_response
 
-    response = if (force || last_response.nil?)
+    response = if (force || should_retrieve?(last_response))
       retrieve
     elsif !last_response.fresh?
       validate_response(last_response)
     end
 
     response
+  end
+
+  def should_retrieve?(last_response)
+    return true if last_response.nil?
+    return true if always_retrieve?
+    return true if after_delay?(last_response)
+    false
+  end
+
+  def after_delay?(last_response)
+    return false if retrieve_delay.to_i <= 0
+    (last_response.date + retrieve_delay) < Time.now
   end
 
   def retrieve
