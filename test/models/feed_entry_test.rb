@@ -22,6 +22,14 @@ describe FeedEntry do
     entry.enclosure.url.must_equal 'http://www.podtrac.com/pts/redirect.mp3/media.blubrry.com/99percentinvisible/cdn.99percentinvisible.org/wp-content/uploads/132-Castle-on-the-Park.mp3'
   end
 
+  it 'can be created from an rss entry with no audio or duration' do
+    rss_feed = Feedjira::Feed.parse(test_file('/fixtures/serial_no_audio.xml'))
+    rss_feed_entry = rss_feed.entries.first
+    entry = FeedEntry.create_with_entry(feed, rss_feed_entry)
+    entry.must_be :valid?
+    entry.duration.must_equal 0
+  end
+
   it 'can be created from an rss entry with media content' do
     rss_feed = Feedjira::Feed.parse(test_file('/fixtures/serialpodcast.xml'))
     rss_feed_entry = rss_feed.entries.first

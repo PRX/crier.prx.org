@@ -94,7 +94,7 @@ class FeedEntry < ActiveRecord::Base
   end
 
   def seconds_for_duration(duration)
-    duration.split(':').reverse.inject([0,0]) do |info, i|
+    (duration  || '').split(':').reverse.inject([0,0]) do |info, i|
       sum = (i.to_i * 60**info[0]) + info[1]
       [(info[0]+1), sum]
     end[1]
