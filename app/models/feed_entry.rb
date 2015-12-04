@@ -84,9 +84,26 @@ class FeedEntry < ActiveRecord::Base
       self.enclosure = Enclosure.build_from_enclosure(entry[:enclosure])
     end
 
-    if !entry[:media_contents].blank?
-      entry[:media_contents].each do |mc|
-        self.contents << Content.build_from_content(mc)
+    # if !entry[:media_contents].blank?
+    #   entry[:media_contents].each do |mc|
+    #     self.contents << Content.build_from_content(mc)
+    #   end
+    # end
+
+    if entry[:media_contents].blank?
+      self.contents.clear
+    else
+      entry[:media_contents].each_with_index do |c, i|
+        existing_content = contents[i]
+        if existing_content && existing_content.url != c.url
+          existing_content.destroy
+          existing_content = nil
+        end
+        if !existing_content
+          new_content = Content.build_from_content(c)
+          contents << new_content
+          new_content.set_list_position(i + 1)
+        end
       end
     end
 
