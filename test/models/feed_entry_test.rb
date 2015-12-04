@@ -39,6 +39,23 @@ describe FeedEntry do
     entry.contents.last.position.must_equal 2
   end
 
+  it 'can be updated from an rss entry with media content' do
+    rss_feed = Feedjira::Feed.parse(test_file('/fixtures/serialpodcast.xml'))
+    rss_feed_entry = rss_feed.entries.first
+    entry = FeedEntry.create_with_entry(feed, rss_feed_entry)
+    entry.contents.size.must_equal 2
+    entry.contents.first.position.must_equal 1
+    entry.contents.last.position.must_equal 2
+    l = entry.contents.last
+
+    rss_feed_entry.title = rss_feed_entry.title + " changed"
+    entry.update_with_entry(rss_feed_entry)
+    entry.contents.size.must_equal 2
+    entry.contents.first.position.must_equal 1
+    entry.contents.last.position.must_equal 2
+    entry.contents.last.must_equal l
+  end
+
   it 'calculates a digest from an rss entry' do
     FeedEntry.entry_digest({foo: 'bar'}).must_equal 'w6uP8Tcg6K2QR905Rms8iXTlksL6OD1KOWBxTK7wxPI='
     FeedEntry.entry_digest({foo: 'bar1'}).wont_equal 'w6uP8Tcg6K2QR905Rms8iXTlksL6OD1KOWBxTK7wxPI='
