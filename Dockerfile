@@ -30,10 +30,10 @@ RUN apt-get install software-properties-common
 RUN apt-add-repository ppa:brightbox/ruby-ng
 
 # basics
-RUN apt-get update -qq && apt-get install -y build-essential
+RUN apt-get update -qq && apt-get install -y --no-install-recommends build-essential
 
 # git
-RUN apt-get install -y git
+RUN apt-get install -y --no-install-recommends git
 
 
 ### Install Ruby
@@ -42,19 +42,19 @@ RUN apt-get install -y git
 RUN /crier_scripts/ruby2.2.sh
 
 # nokogiri dependency
-RUN apt-get install -y libxml2-dev libxslt1-dev
+RUN apt-get install -y --no-install-recommends libxml2-dev libxslt1-dev
 
 # redis
-RUN apt-get install -y redis-tools
+RUN apt-get install -y --no-install-recommends redis-tools
 
 # postgres
-RUN apt-get install -y libpq-dev
+RUN apt-get install -y --no-install-recommends libpq-dev
 
 ## For all kinds of stuff.
-RUN apt-get install -y zlib1g-dev
+RUN apt-get install -y --no-install-recommends zlib1g-dev
 
 # js runtime
-RUN apt-get install -y nodejs
+RUN apt-get install -y --no-install-recommends nodejs
 
 
 ### Clean
