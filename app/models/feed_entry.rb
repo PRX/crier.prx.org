@@ -4,7 +4,7 @@ class FeedEntry < ActiveRecord::Base
   acts_as_paranoid
 
   belongs_to :feed
-  has_many :contents, -> { order("position ASC") }
+  has_many :contents, -> { order("position ASC") }, dependent: :destroy
   has_one :enclosure
 
   serialize :categories, JSON
@@ -111,6 +111,9 @@ class FeedEntry < ActiveRecord::Base
           contents << new_content
           new_content.set_list_position(i + 1)
         end
+      end
+      if entry[:media_contents].size < contents.size
+        contents = contents[0, entry[:media_contents].size]
       end
     end
   end
