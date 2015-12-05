@@ -80,16 +80,23 @@ class FeedEntry < ActiveRecord::Base
     author_attr = entry[:itunes_author] || entry[:author] || entry[:creator]
     self.author = Person.new(author_attr) if author_attr
 
-    if entry[:enclosure]
-      self.enclosure = Enclosure.build_from_enclosure(entry[:enclosure])
+    update_enclosure(entry)
+    update_contents(entry)
+
+    self
+  end
+
+  def update_enclosure(entry)
+    if !entry[:enclosure] || (enclosure && enclosure.url != entry[:enclosure].url)
+      self.enclosure.destroy if enclosure
+      self.enclosure = nil
     end
+    if entry[:enclosure]
+      self.enclosure ||= Enclosure.build_from_enclosure(entry[:enclosure])
+    end
+  end
 
-    # if !entry[:media_contents].blank?
-    #   entry[:media_contents].each do |mc|
-    #     self.contents << Content.build_from_content(mc)
-    #   end
-    # end
-
+  def update_contents(entry)
     if entry[:media_contents].blank?
       self.contents.clear
     else
@@ -106,8 +113,6 @@ class FeedEntry < ActiveRecord::Base
         end
       end
     end
-
-    self
   end
 
   def seconds_for_duration(duration)
