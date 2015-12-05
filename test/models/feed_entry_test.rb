@@ -78,4 +78,11 @@ describe FeedEntry do
     end
   end
 
+  it 'handles update of enclosure url' do
+    raise NotImplementedError
+  end
+
+  it 'handles update contents count' do
+    raise NotImplementedError
+  end
 end
