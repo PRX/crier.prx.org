@@ -57,8 +57,8 @@ describe FeedEntry do
   end
 
   it 'calculates a digest from an rss entry' do
-    FeedEntry.entry_digest({foo: 'bar'}).must_equal 'w6uP8Tcg6K2QR905Rms8iXTlksL6OD1KOWBxTK7wxPI='
-    FeedEntry.entry_digest({foo: 'bar1'}).wont_equal 'w6uP8Tcg6K2QR905Rms8iXTlksL6OD1KOWBxTK7wxPI='
+    FeedEntry.entry_digest({foo: 'bar'}).must_equal 'O6iQfnolIydIjfOQ7VF8Rblt6tAzYAIZvcpxB9HT+Io='
+    FeedEntry.entry_digest({foo: 'bar1'}).wont_equal 'O6iQfnolIydIjfOQ7VF8Rblt6tAzYAIZvcpxB9HT+Io='
   end
 
   it 'checks if the entry is changed' do
