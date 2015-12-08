@@ -79,10 +79,30 @@ describe FeedEntry do
   end
 
   it 'handles update of enclosure url' do
-    raise NotImplementedError
+    rss_feed = Feedjira::Feed.parse(test_file('/fixtures/serialpodcast.xml'))
+    rss_feed_entry = rss_feed.entries.first
+    entry = FeedEntry.create_with_entry(feed, rss_feed_entry)
+    enc = entry.enclosure
+
+    # no enclosure created for the same entry
+    entry.update_enclosure(rss_feed_entry).must_equal enc
+
+    # new enclosure created
+    rss_feed_entry[:enclosure].url = "http://dts.podtrac.com/redirect.mp3/files.serialpodcast.org/sites/default/files/podcast/1445350094/serial-s01-e12_UPDATED.mp3"
+    new_enc = entry.update_enclosure(rss_feed_entry)
+    new_enc.wont_be_nil
+    new_enc.wont_equal enc
   end
 
   it 'handles update contents count' do
-    raise NotImplementedError
+    rss_feed_4c = Feedjira::Feed.parse(test_file('/fixtures/serialpodcast_4contents.xml'))
+    rss_feed_entry_4c = rss_feed_4c.entries.first
+    entry = FeedEntry.create_with_entry(feed, rss_feed_entry_4c)
+    entry.contents.size.must_equal 4
+
+    rss_feed = Feedjira::Feed.parse(test_file('/fixtures/serialpodcast.xml'))
+    rss_feed_entry = rss_feed.entries.first
+    entry.update_contents(rss_feed_entry)
+    entry.contents.size.must_equal 2
   end
 end
