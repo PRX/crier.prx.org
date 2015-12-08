@@ -94,6 +94,7 @@ class FeedEntry < ActiveRecord::Base
     if entry[:enclosure]
       self.enclosure ||= Enclosure.build_from_enclosure(entry[:enclosure])
     end
+    enclosure
   end
 
   def update_contents(entry)
@@ -113,7 +114,7 @@ class FeedEntry < ActiveRecord::Base
         end
       end
       if entry[:media_contents].size < contents.size
-        contents = contents[0, entry[:media_contents].size]
+        self.contents = contents[0, entry[:media_contents].size]
       end
     end
   end
