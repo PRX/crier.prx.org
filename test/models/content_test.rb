@@ -2,6 +2,7 @@ require 'test_helper'
 
 describe Content do
 
+  let(:feed_entry) { create(:feed_entry) }
   let(:content) { Content.new(url: 'u', file_size: 10, mime_type: 'mt') }
   let(:rss_content) {
     rss_feed = Feedjira::Feed.parse(test_file('/fixtures/serialpodcast.xml'))
@@ -10,7 +11,7 @@ describe Content do
   }
 
   it 'can be constructed from feed content' do
-    c = Content.build_from_content(rss_content)
+    c = Content.build_from_content(feed_entry, rss_content)
     c.is_default.wont_equal true
     c.bitrate.must_equal 64
     c.channels.must_equal 1
