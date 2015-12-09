@@ -33,8 +33,9 @@ class FeedEntry < ActiveRecord::Base
   end
 
   def self.create_with_entry(feed, entry)
-    new.update_attributes_with_entry(entry).tap do |fe|
+    new.tap do |fe|
       fe.feed = feed
+      fe.update_attributes_with_entry(entry)
       fe.save
     end
   end
