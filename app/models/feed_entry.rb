@@ -4,7 +4,7 @@ class FeedEntry < ActiveRecord::Base
   acts_as_paranoid
 
   belongs_to :feed
-  has_many :contents, -> { order("position ASC") }
+  has_many :contents, -> { order("position ASC") }, dependent: :destroy
   has_one :enclosure
 
   serialize :categories, JSON
@@ -80,16 +80,24 @@ class FeedEntry < ActiveRecord::Base
     author_attr = entry[:itunes_author] || entry[:author] || entry[:creator]
     self.author = Person.new(author_attr) if author_attr
 
-    if entry[:enclosure]
-      self.enclosure = Enclosure.build_from_enclosure(entry[:enclosure])
+    update_enclosure(entry)
+    update_contents(entry)
+
+    self
+  end
+
+  def update_enclosure(entry)
+    if !entry[:enclosure] || (enclosure && enclosure.url != entry[:enclosure].url)
+      self.enclosure.destroy if enclosure
+      self.enclosure = nil
     end
+    if entry[:enclosure]
+      self.enclosure ||= Enclosure.build_from_enclosure(entry[:enclosure])
+    end
+    enclosure
+  end
 
-    # if !entry[:media_contents].blank?
-    #   entry[:media_contents].each do |mc|
-    #     self.contents << Content.build_from_content(mc)
-    #   end
-    # end
-
+  def update_contents(entry)
     if entry[:media_contents].blank?
       self.contents.clear
     else
@@ -105,9 +113,10 @@ class FeedEntry < ActiveRecord::Base
           new_content.set_list_position(i + 1)
         end
       end
+      if entry[:media_contents].size < contents.size
+        self.contents = contents[0, entry[:media_contents].size]
+      end
     end
-
-    self
   end
 
   def seconds_for_duration(duration)
