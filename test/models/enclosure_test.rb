@@ -11,7 +11,7 @@ describe Enclosure do
   }
 
   it 'can be constructed from feed enclosure' do
-    e = Enclosure.build_from_enclosure(rss_enclosure)
+    e = Enclosure.build_from_enclosure(feed_entry, rss_enclosure)
     e.url.must_equal 'http://dts.podtrac.com/redirect.mp3/files.serialpodcast.org/sites/default/files/podcast/1445350094/serial-s01-e12.mp3'
     e.file_size.must_equal 27485957
     e.mime_type.must_equal 'audio/mpeg'

@@ -92,7 +92,7 @@ class FeedEntry < ActiveRecord::Base
       self.enclosure = nil
     end
     if entry[:enclosure]
-      self.enclosure ||= Enclosure.build_from_enclosure(entry[:enclosure])
+      self.enclosure ||= Enclosure.build_from_enclosure(self, entry[:enclosure])
     end
     enclosure
   end
@@ -108,7 +108,7 @@ class FeedEntry < ActiveRecord::Base
           existing_content = nil
         end
         if !existing_content
-          new_content = Content.build_from_content(c)
+          new_content = Content.build_from_content(self, c)
           contents << new_content
           new_content.set_list_position(i + 1)
         end
