@@ -33,10 +33,12 @@ class Feed < ActiveRecord::Base
   def sync(force=false)
     return unless response = updated_response(force)
 
-    feed = Feedjira::Feed.parse(response.body)
-    update_feed(feed)
-    keepers = feed.entries.map { |e| insert_or_update_entry(e).id }
-    entries.where('id not in (?)', keepers).each {|e| e.destroy }
+    with_lock do
+      feed = Feedjira::Feed.parse(response.body)
+      update_feed!(feed)
+      keepers = feed.entries.map { |e| insert_or_update_entry(e).id }
+      entries.where('id not in (?)', keepers).each {|e| e.destroy }
+    end
   end
 
   def parse_categories(feed)
@@ -52,7 +54,7 @@ class Feed < ActiveRecord::Base
     (ikey + mkey).compact.uniq
   end
 
-  def update_feed(feed)
+  def update_feed!(feed)
     %w( copyright description feedburner_name generator language last_built
       last_modified pub_date published title ttl
       update_frequency update_period url web_master
@@ -67,29 +69,28 @@ class Feed < ActiveRecord::Base
       self.try("#{v}=", feed.try(k))
     end
 
-    self.web_master = Person.new(feed.web_master) if feed.web_master
-    self.managing_editor = Person.new(feed.managing_editor) if feed.managing_editor
-    self.author = Person.new(feed.itunes_author) if feed.itunes_author
-    owners_list = Array(feed.itunes_owners)
-    self.owners = owners_list.map { |o| Person.new(name: o.name, email: o.email) } unless owners_list.blank?
+    self.web_master = feed.web_master ? Person.new(feed.web_master) : nil
+    self.managing_editor = feed.managing_editor ? Person.new(feed.managing_editor) : nil
+    self.author = feed.itunes_author ? Person.new(feed.itunes_author) : nil
+    self.owners = Array(feed.itunes_owners).map { |o| Person.new(name: o.name, email: o.email) }
 
-    self.block      = (feed.itunes_block == 'yes')
+    self.block = (feed.itunes_block == 'yes')
     self.categories = parse_categories(feed)
-    self.complete   = (feed.itunes_complete == 'yes')
-    self.copyright  ||= feed.media_copyright
-    self.explicit   = (feed.itunes_explicit && feed.itunes_explicit != 'no')
-    self.hub_url    = Array(feed.hubs).first
-    self.thumb_url  = feed.image.try(:url)
-    self.keywords   = parse_keywords(feed)
+    self.complete = (feed.itunes_complete == 'yes')
+    self.copyright ||= feed.media_copyright
+    self.explicit = (feed.itunes_explicit && feed.itunes_explicit != 'no')
+    self.hub_url = Array(feed.hubs).first
+    self.keywords = parse_keywords(feed)
+    self.thumb_url = feed.image.try(:url)
 
     save!
   end
 
   def insert_or_update_entry(entry)
     if current = find_entry(entry)
-      current.update_with_entry(entry)
+      current.update_with_entry!(entry)
     else
-      current = FeedEntry.create_with_entry(self, entry)
+      current = FeedEntry.create_with_entry!(self, entry)
     end
     current
   end
