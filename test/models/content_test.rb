@@ -3,7 +3,7 @@ require 'test_helper'
 describe Content do
 
   let(:feed_entry) { create(:feed_entry) }
-  let(:content) { Content.new(url: 'u', file_size: 10, mime_type: 'mt') }
+  let(:content) { Content.create(url: 'u', file_size: 10, mime_type: 'mt') }
   let(:rss_content) {
     rss_feed = Feedjira::Feed.parse(test_file('/fixtures/serialpodcast.xml'))
     rss_feed_entry = rss_feed.entries.first
@@ -26,7 +26,7 @@ describe Content do
   end
 
   it 'can be updated' do
-    content.update_with_content(rss_content)
+    content.update_with_content!(rss_content)
     content.url.must_equal "https://s3.amazonaws.com/prx-dovetail/testserial/serial_audio.mp3"
     content.file_size.must_equal 26017749
     content.mime_type.must_equal 'audio/mpeg'
