@@ -1,5 +1,4 @@
 class Content < MediaResource
-  acts_as_list scope: :feed_entry
 
   def self.build_from_content(entry, content)
     new.update_attributes_with_content(content)
@@ -9,9 +8,9 @@ class Content < MediaResource
     end
   end
 
-  def update_with_content(content)
+  def update_with_content!(content)
     update_attributes_with_content(content)
-    save
+    save!
   end
 
   def update_attributes_with_content(content)
