@@ -32,11 +32,10 @@ class FeedEntry < ActiveRecord::Base
     announce(:feed_entry, action, entry)
   end
 
-  def self.create_with_entry(feed, entry)
+  def self.create_with_entry!(feed, entry)
     new.tap do |fe|
       fe.feed = feed
-      fe.update_attributes_with_entry(entry)
-      fe.save
+      fe.update_attributes_with_entry!(entry)
     end
   end
 
@@ -48,15 +47,16 @@ class FeedEntry < ActiveRecord::Base
     digest != FeedEntry.entry_digest(entry)
   end
 
-  def update_with_entry(entry)
+  def update_with_entry!(entry)
     restore if deleted?
     if is_changed?(entry)
-      update_attributes_with_entry(entry)
-      save
+      with_lock do
+        update_attributes_with_entry!(entry)
+      end
     end
   end
 
-  def update_attributes_with_entry(entry)
+  def update_attributes_with_entry!(entry)
     self.digest = FeedEntry.entry_digest(entry)
 
     %w( categories comment_count comment_rss_url comment_url content description
@@ -83,7 +83,7 @@ class FeedEntry < ActiveRecord::Base
 
     update_enclosure(entry)
     update_contents(entry)
-
+    save!
     self
   end
 
@@ -100,23 +100,33 @@ class FeedEntry < ActiveRecord::Base
 
   def update_contents(entry)
     if entry[:media_contents].blank?
-      self.contents.clear
+      contents.destroy_all
     else
+      to_insert = []
+      to_destroy = []
+
+      if contents.size > entry[:media_contents].size
+        to_destroy = contents[entry[:media_contents].size..(contents.size - 1)]
+      end
+
       entry[:media_contents].each_with_index do |c, i|
-        existing_content = contents[i]
-        if existing_content && existing_content.url != c.url
-          existing_content.destroy
-          existing_content = nil
+        existing_content = self.contents[i]
+        if existing_content
+          if existing_content.url == c.url
+            existing_content.update_with_content!(c)
+          else
+            to_destroy << existing_content
+            existing_content = nil
+          end
         end
         if !existing_content
           new_content = Content.build_from_content(self, c)
-          contents << new_content
-          new_content.set_list_position(i + 1)
+          new_content.position = i + 1
+          to_insert << new_content
         end
       end
-      if entry[:media_contents].size < contents.size
-        self.contents = contents[0, entry[:media_contents].size]
-      end
+      self.contents.destroy(to_destroy)
+      to_insert.each{|c| contents << c}
     end
   end
 
