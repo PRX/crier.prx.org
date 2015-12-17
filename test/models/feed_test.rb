@@ -7,7 +7,7 @@ describe Feed do
 
   describe 'entries and updates' do
 
-    let (:feed_entry) {create(:feed_entry) }
+    let (:feed_entry) { create(:feed_entry) }
 
     it 'can find an existing entry by entry_id' do
       entry = OpenStruct.new
