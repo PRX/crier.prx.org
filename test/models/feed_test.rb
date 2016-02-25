@@ -93,6 +93,12 @@ describe Feed do
     conn.url_prefix.to_s.must_equal 'http://feeds.99percentinvisible.org/'
   end
 
+  it 'sets a custom user agent' do
+    conn = feed.connection
+    conn.headers['User-Agent'].wont_match /Faraday/
+    conn.headers['User-Agent'].must_match /^PRX Crier/
+  end
+
   it 'can get last successful response' do
     response = feed_response
     response.wont_be_nil
