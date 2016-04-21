@@ -2,8 +2,6 @@ source 'https://rubygems.org'
 
 # Bundle edge Rails instead: gem 'rails', github: 'rails/rails'
 gem 'rails', '4.2.4'
-# Use postgresql as the database for Active Record
-gem 'pg'
 # Use SCSS for stylesheets
 gem 'sass-rails', '~> 5.0'
 # Use Uglifier as compressor for JavaScript assets
@@ -21,6 +19,12 @@ gem 'turbolinks'
 gem 'jbuilder', '~> 2.0'
 # bundle exec rake doc:rails generates the API under doc/api.
 gem 'sdoc', '~> 0.4.0', group: :doc
+gem 'rdoc', '~> 4.2.2'
+
+gem 'rake'
+
+# Use postgresql as the database for Active Record
+gem 'pg'
 
 gem 'addressable'
 
@@ -43,17 +47,26 @@ group :development, :test do
   # Call 'byebug' anywhere in the code to stop execution and get a debugger console
   gem 'byebug'
 
-  gem 'guard'
-  gem 'guard-minitest'
-  gem 'guard-bundler'
-end
-
-group :development do
-  # Access an IRB console on exception pages or by using <%= console %> in views
-  gem 'web-console', '~> 2.0'
+  # Pry is an IRB alternative and runtime developer console
+  gem 'pry-rails'
 
   # Spring speeds up development by keeping your application running in the background. Read more: https://github.com/rails/spring
   gem 'spring'
+end
+
+group :development do
+  # Quiet Assets turns off Rails asset pipeline log
+  gem 'quiet_assets'
+
+  # HighLine is a higher level command-line oriented interface
+  gem 'highline'
+
+  gem 'guard'
+  gem 'guard-minitest'
+  gem 'guard-bundler'
+
+  # Access an IRB console on exception pages or by using <%= console %> in views
+  gem 'web-console', '~> 2.0'
 end
 
 group :test do
@@ -67,10 +80,9 @@ group :test do
 end
 
 group :production do
+  # Include 'rails_12factor' gem to enable all Heroku platform features
   gem 'rails_12factor'
-end
 
-group :development, :production, :staging do
-  gem 'foreman'
-  gem 'unicorn'
+  # Use puma as the HTTP server
+  gem 'puma'
 end
