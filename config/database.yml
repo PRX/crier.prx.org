@@ -24,6 +24,7 @@ default: &default
   password: <%= ENV['DB_ENV_POSTGRES_PASSWORD'] %>
   host: <%= ENV['DB_PORT_5432_TCP_ADDR'] %>
   port: <%= ENV['DB_PORT_5432_TCP_PORT'] %>
+  database: <%= ENV['DB_ENV_POSTGRES_DATABASE'] %>
 
 development:
   <<: *default
@@ -84,4 +85,3 @@ test:
 #
 production:
   <<: *default
-  database: <%= ENV['DB_ENV_POSTGRES_DATABASE'] %>
