@@ -80,7 +80,7 @@ group :test do
 end
 
 group :production do
-  # Include 'rails_12factor' gem to enable all Heroku platform features
+  # Include 'rails_12factor' gem to send logging to stdout and serve assets in production mode
   gem 'rails_12factor'
 
   # Use puma as the HTTP server
