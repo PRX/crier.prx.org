@@ -34,7 +34,6 @@ We're using Docker for deployment, so this is also a good way to make sure devel
 
 #### Prerequisites
 [Install Dinghy and related projects](https://github.com/codekitchen/dinghy)
-Notes:
 * Using 'VirtualBox' is recommended.
 * Also be sure to install `docker-compose` along with the toolbox
 
@@ -128,4 +127,6 @@ open http://crier.prx.dev
 [AGPL License](https://www.gnu.org/licenses/agpl-3.0.html)
 
 ## Contributing
+To get started, <a href="https://www.clahub.com/agreements/PRX/crier.prx.org">sign the Contributor License Agreement</a>.
+
 Completing a Contributor License Agreement (CLA) is required for PRs to be accepted.
