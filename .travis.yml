@@ -1,0 +1,15 @@
+language: ruby
+rvm:
+  - 2.2.4
+services:
+  - docker
+env:
+  global:
+    - RAILS_ENV=test
+before_install:
+  - sudo /etc/init.d/postgresql stop
+script:
+  - cp env-example .env
+  - docker-compose build
+  # TODO: do we have to migrate, or will the test script run that for us...?
+  - docker-compose run app test

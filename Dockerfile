@@ -37,7 +37,5 @@ ADD . ./
 RUN chown -R nobody:nogroup /app
 USER nobody
 
-RUN bundle exec rake assets:precompile RAILS_ENV=production
-
 ENTRYPOINT ["/tini", "--", "./bin/application"]
 CMD ["web"]
