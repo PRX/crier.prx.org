@@ -46,5 +46,10 @@ def test_file(path)
   File.read( File.dirname(__FILE__) + path)
 end
 
+def stub_head_requests(url_regex)
+  stub_request(:head, url_regex).
+    to_return(status: 200, body: '', headers: { etag: '1234' })
+end
+
 include Announce::Testing
 reset_announce

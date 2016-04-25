@@ -11,8 +11,7 @@ describe Enclosure do
   }
 
   before {
-    stub_request(:head, /http:\/\/.*\.podtrac.com\/.*/).
-      to_return(status: 200, body: '', headers: { etag: '1234' })
+    stub_head_requests(/http:\/\/.*\.podtrac.com\/.*/)
   }
 
   it 'can be constructed from feed enclosure' do
