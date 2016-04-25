@@ -20,7 +20,7 @@ When a change of any kind to an rss item is detected, it uses the `announce` gem
 These instructions are written assuming Mac OS X install.
 
 ### Basics
-```
+```shell
 # Homebrew - http://brew.sh/
 ruby -e "$(curl -fsSL https://raw.github.com/Homebrew/homebrew/go/install)"
 
@@ -36,9 +36,10 @@ We're using Docker for deployment, so this is also a good way to make sure devel
 [Install Dinghy and related projects](https://github.com/codekitchen/dinghy)
 * Using 'VirtualBox' is recommended.
 * Also be sure to install `docker-compose` along with the toolbox
+* TODO: document aws config...
 
 #### Install Crier
-```
+```shell
 # Get the code
 git clone git@github.com:PRX/crier.prx.org.git
 cd crier.prx.org
@@ -54,6 +55,7 @@ docker-compose build
 docker-compose start db
 
 # ... and run migrations against it
+docker-compose up db # the database has to be running
 docker-compose run app migrate
 
 # Create SQS (and SNS) configuration
