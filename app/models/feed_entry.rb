@@ -88,14 +88,15 @@ class FeedEntry < ActiveRecord::Base
   end
 
   def update_enclosure(entry)
-    if !entry[:enclosure] || (enclosure && enclosure.url != entry[:enclosure].url)
-      self.enclosure.destroy if enclosure
+    enclosures_differ = self.enclosure && self.enclosure.differs_from?(entry[:enclosure])
+    if enclosures_differ
+      self.enclosure.destroy if self.enclosure
       self.enclosure = nil
     end
     if entry[:enclosure]
       self.enclosure ||= Enclosure.build_from_enclosure(self, entry[:enclosure])
     end
-    enclosure
+    self.enclosure
   end
 
   def update_contents(entry)
