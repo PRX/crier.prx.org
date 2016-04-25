@@ -34,6 +34,11 @@ class Enclosure < MediaResource
       client.adapter :excon
       client.use FaradayMiddleware::FollowRedirects
     end
-    conn.head[:etag]
+    etag = conn.head[:etag]
+    if !etag.empty?
+      etag
+    else
+      nil
+    end
   end
 end
