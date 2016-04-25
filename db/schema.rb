@@ -11,7 +11,7 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema.define(version: 20151101205144) do
+ActiveRecord::Schema.define(version: 20160425140442) do
 
   # These are extensions that must be enabled in order to support this database
   enable_extension "plpgsql"
@@ -125,6 +125,7 @@ ActiveRecord::Schema.define(version: 20151101205144) do
     t.datetime "created_at",    null: false
     t.datetime "updated_at",    null: false
     t.integer  "position"
+    t.string   "etag"
   end
 
   add_index "media_resources", ["feed_entry_id"], name: "index_media_resources_on_feed_entry_id", using: :btree
