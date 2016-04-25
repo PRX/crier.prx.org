@@ -5,6 +5,11 @@ describe FeedEntry do
   let(:feed_entry) { create(:feed_entry) }
   let(:feed) { feed_entry.feed }
 
+  before {
+    stub_request(:head, /http:\/\/.*\.podtrac.com\/.*/).
+      to_return(status: 200, body: '', headers: { etag: '1234' })
+  }
+
   it 'announces changes' do
     feed_entry.stub(:announce, true) do
       feed_entry.announce_entry(:create)
@@ -89,6 +94,24 @@ describe FeedEntry do
 
     # new enclosure created
     rss_feed_entry[:enclosure].url = "http://dts.podtrac.com/redirect.mp3/files.serialpodcast.org/sites/default/files/podcast/1445350094/serial-s01-e12_UPDATED.mp3"
+    new_enc = entry.update_enclosure(rss_feed_entry)
+    new_enc.wont_be_nil
+    new_enc.wont_equal enc
+  end
+
+  it 'handles update of enclosure mp3 ETag header' do
+    rss_feed = Feedjira::Feed.parse(test_file('/fixtures/serialpodcast.xml'))
+    rss_feed_entry = rss_feed.entries.first
+    entry = FeedEntry.create_with_entry!(feed, rss_feed_entry)
+    enc = entry.enclosure
+
+    # no enclosure created for the same entry
+    entry.update_enclosure(rss_feed_entry).must_equal enc
+
+    stub_request(:head, /http:\/\/.*\.podtrac.com\/.*/).
+      to_return(:status => 200, :body => "", :headers => { etag: '5678' })
+
+    # new enclosure created
     new_enc = entry.update_enclosure(rss_feed_entry)
     new_enc.wont_be_nil
     new_enc.wont_equal enc

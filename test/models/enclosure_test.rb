@@ -10,6 +10,11 @@ describe Enclosure do
     rss_feed_entry.enclosure
   }
 
+  before {
+    stub_request(:head, /http:\/\/.*\.podtrac.com\/.*/).
+      to_return(status: 200, body: '', headers: { etag: '1234' })
+  }
+
   it 'can be constructed from feed enclosure' do
     e = Enclosure.build_from_enclosure(feed_entry, rss_enclosure)
     e.url.must_equal 'http://dts.podtrac.com/redirect.mp3/files.serialpodcast.org/sites/default/files/podcast/1445350094/serial-s01-e12.mp3'
