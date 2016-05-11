@@ -43,6 +43,9 @@ gem 'announce'
 gem 'paranoia', '~> 2.0'
 gem 'actionpack-action_caching'
 
+# paging
+gem 'kaminari'
+
 gem "responders"
 gem "roar-rails"
 gem 'hal_api-rails', '~> 0.2.4'
