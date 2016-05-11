@@ -1,24 +1,12 @@
-class FeedEntryRepresenter < BaseRepresenter
+class Api::FeedEntryRepresenter < Api::BaseRepresenter
 
-  curies do
-    [{
-      name: :prx,
-      href: "http://#{prx_meta_host}/relation/{rel}",
-      templated: true
-    }]
-  end
-
-  link :self do
-    api_feed_entry_path represented.feed, represented
-  end
-
-  link 'prx:feed' do
+  link :feed do
     {
       href: api_feed_path(represented.feed),
-      title: represented.feed.title
+      title: represented.feed.name
     } if represented.feed
   end
-  embed :feed, as: 'prx:feed', class: Feed, decorator: FeedRepresenter
+  embed :feed, class: Feed, decorator: FeedRepresenter
 
   property :entry_id, as: :guid
   property :is_perma_link

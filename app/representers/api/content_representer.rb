@@ -1,4 +1,4 @@
-class ContentRepresenter < BaseRepresenter
+class Api::ContentRepresenter < Api::BaseRepresenter
   property :position
   property :url
   property :mime_type, as: :type

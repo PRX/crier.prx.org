@@ -1,4 +1,4 @@
-class FeedRepresenter < BaseRepresenter
+class Api::FeedRepresenter < Api::BaseRepresenter
   link :self do
     api_feed_path represented
   end

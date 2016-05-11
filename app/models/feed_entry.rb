@@ -28,7 +28,7 @@ class FeedEntry < ActiveRecord::Base
   end
 
   def announce_entry(action)
-    entry = FeedEntryRepresenter.new(self).to_json
+    entry = Api::FeedEntryRepresenter.new(self).to_json
     announce(:feed_entry, action, entry)
   end
 
