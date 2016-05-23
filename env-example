@@ -13,3 +13,5 @@ DB_PORT_5432_TCP_PORT=5432
 
 SECRET_KEY_BASE=thisisnotasecret
 SECRET_TOKEN=thisisnotasecret
+
+NEW_RELIC_KEY=
