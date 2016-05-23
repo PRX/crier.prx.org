@@ -55,3 +55,12 @@ end
 
 include Announce::Testing
 reset_announce
+
+TestObject = Struct.new(:title, :is_root_resource) do
+  extend ActiveModel::Naming
+  def persisted?; false; end
+  def to_model; self; end
+  def to_param; '1'; end
+  def id; 1; end
+  def id=(_id); _id; end
+end
