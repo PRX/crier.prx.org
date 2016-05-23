@@ -50,6 +50,9 @@ gem "responders"
 gem "roar-rails"
 gem 'hal_api-rails', '~> 0.2.4'
 
+# monitoring
+gem 'newrelic_rpm'
+
 group :development, :test do
   # Call 'byebug' anywhere in the code to stop execution and get a debugger console
   gem 'byebug'
