@@ -1,4 +1,6 @@
-class Api::ContentRepresenter < Api::BaseRepresenter
+class Api::ContentRepresenter < Roar::Decorator
+  include Roar::JSON::HAL
+
   property :position
   property :url
   property :mime_type, as: :type

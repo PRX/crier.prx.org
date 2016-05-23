@@ -1,9 +1,10 @@
 class Api::FeedRepresenter < Api::BaseRepresenter
-  link :self do
-    api_feed_path represented
+
+  def self_url(feed)
+    api_feed_path(feed)
   end
 
-  link 'prx:entries' do
+  link :entries do
     api_feed_entries_path represented
   end
 
