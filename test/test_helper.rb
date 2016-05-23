@@ -1,3 +1,5 @@
+ENV['RAILS_ENV'] = 'test'
+
 require 'simplecov'
 SimpleCov.start 'rails'
 
@@ -48,7 +50,7 @@ end
 
 def stub_head_requests(url_regex)
   stub_request(:head, url_regex).
-    to_return(status: 200, body: '', headers: { etag: '1234' })
+    to_return(status: 200, body: '', headers: {})
 end
 
 include Announce::Testing
