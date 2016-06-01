@@ -4,7 +4,7 @@ PROCESS=
 CMD_ARGS=
 
 ApplicationUsage () {
-  echo "usage: application [ help | web | worker | test | guard | migrate | sqs | -- ]"
+  echo "usage: application [ help | web | worker | test | guard | migrate | sqs | rails | -- ]"
 }
 
 ApplicationParseOpts () {
