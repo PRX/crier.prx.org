@@ -7,6 +7,7 @@ describe FeedEntry do
 
   before {
     stub_head_requests(/http:\/\/.*\.podtrac.com\/.*/)
+    stub_head_requests(/https:\/\/s3\.amazonaws.com\/.*/)
   }
 
   it 'announces changes' do
@@ -99,60 +100,44 @@ describe FeedEntry do
   end
 
   describe 'enclosure etag handling' do
-    def get_first_entry(filename = '/fixtures/serialpodcast.xml')
-      rss_feed = Feedjira::Feed.parse(test_file(filename))
-      rss_feed_entry = rss_feed.entries.first
-      entry = FeedEntry.create_with_entry!(feed, rss_feed_entry)
-      enclosure = entry.enclosure
-      return rss_feed_entry, entry, enclosure
+    let(:rss_feed) { Feedjira::Feed.parse(test_file('/fixtures/serialpodcast.xml')) }
+    let(:rss_feed_entry) { rss_feed.entries.first }
+    let(:entry) { FeedEntry.create_with_entry!(feed, rss_feed_entry) }
+
+    it 'enclosure etag added when previously empty' do
+      stub_request(:head, /http:\/\/.*\.podtrac.com\/.*/).
+        to_return(status: 200, body: "", headers: { etag: "5678" })
+
+      enc = entry.enclosure
+      entry.update_enclosure(rss_feed_entry).must_equal enc
+      entry.enclosure.etag.must_equal "5678"
     end
 
     it 'updates the feed entry when the etag changes' do
-      rss_feed_entry, entry, enc = get_first_entry
+      stub_request(:head, /https:\/\/s3\.amazonaws.com\/.*/).
+        to_return(status: 200, body: "", headers: { etag: "5678" })
 
-      # no enclosure created for the same entry
+      enc = entry.enclosure
       entry.update_enclosure(rss_feed_entry).must_equal enc
 
-      stub_request(:head, /http:\/\/.*\.podtrac.com\/.*/).
-        to_return(status: 200, body: '', headers: { etag: '5678' })
-
       # new enclosure created
+      entry.enclosure.etag = "1234"
       new_enc = entry.update_enclosure(rss_feed_entry)
       new_enc.wont_be_nil
       new_enc.wont_equal enc
     end
 
     it 'updates the feed entry when the etag is removed' do
-      rss_feed_entry, entry, enc = get_first_entry
+      stub_request(:head, /https:\/\/s3\.amazonaws.com\/.*/).
+        to_return(status: 200, body: '', headers: {})
 
-      # no enclosure created for the same entry
-      entry.update_enclosure(rss_feed_entry).must_equal enc
-
-      stub_request(:head, /http:\/\/.*\.podtrac.com\/.*/).
-        to_return(status: 200, body: '', headers: { etag: nil })
+      enc = entry.enclosure
 
       # new enclosure created
+      entry.enclosure.etag = "1234"
       new_enc = entry.update_enclosure(rss_feed_entry)
       new_enc.wont_be_nil
       new_enc.wont_equal enc
-    end
-
-    it 'considers an empty etag to be equivalent to no etag' do
-      stub_request(:head, /http:\/\/.*\.podtrac.com\/.*/).
-        to_return(status: 200, body: '', headers: { etag: '' })
-
-      rss_feed_entry, entry, enc = get_first_entry
-
-      # no enclosure created for the same entry
-      entry.update_enclosure(rss_feed_entry).must_equal enc
-
-      stub_request(:head, /http:\/\/.*\.podtrac.com\/.*/).
-        to_return(status: 200, body: '', headers: { etag: nil })
-
-      # should not update
-      new_enc = entry.update_enclosure(rss_feed_entry)
-      new_enc.wont_be_nil
-      new_enc.must_equal enc
     end
   end
 

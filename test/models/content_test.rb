@@ -10,6 +10,10 @@ describe Content do
     rss_feed_entry[:media_contents].first
   }
 
+  before {
+    stub_head_requests(/https:\/\/.*\.amazonaws.com\/.*/)
+  }
+
   it 'can be constructed from feed content' do
     c = Content.build_from_content(feed_entry, rss_content)
     c.is_default.wont_equal true

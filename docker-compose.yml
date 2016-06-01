@@ -10,7 +10,7 @@ app:
     - "3000:3000"
   command: web
   environment:
-    VIRTUAL_HOST: crier.docker
+    VIRTUAL_HOST: crier.prx.docker
 worker:
   image: crierprxorg_app
   volumes:

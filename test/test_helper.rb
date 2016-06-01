@@ -1,3 +1,5 @@
+ENV['RAILS_ENV'] = 'test'
+
 require 'simplecov'
 SimpleCov.start 'rails'
 
@@ -48,8 +50,17 @@ end
 
 def stub_head_requests(url_regex)
   stub_request(:head, url_regex).
-    to_return(status: 200, body: '', headers: { etag: '1234' })
+    to_return(status: 200, body: '', headers: {})
 end
 
 include Announce::Testing
 reset_announce
+
+TestObject = Struct.new(:title, :is_root_resource) do
+  extend ActiveModel::Naming
+  def persisted?; false; end
+  def to_model; self; end
+  def to_param; '1'; end
+  def id; 1; end
+  def id=(_id); _id; end
+end

@@ -28,7 +28,7 @@ class FeedEntry < ActiveRecord::Base
   end
 
   def announce_entry(action)
-    entry = FeedEntryRepresenter.new(self).to_json
+    entry = Api::FeedEntryRepresenter.new(self).to_json
     announce(:feed_entry, action, entry)
   end
 
@@ -88,11 +88,18 @@ class FeedEntry < ActiveRecord::Base
   end
 
   def update_enclosure(entry)
-    enclosures_differ = enclosure && enclosure.differs_from?(entry[:enclosure])
-    if enclosures_differ
-      self.enclosure.destroy if enclosure
-      self.enclosure = nil
+    if enclosure
+      new_etag = enclosure.get_media_etag(enclosure.url)
+      if enclosure.etag.blank? && new_etag
+        enclosure.update_attribute(:etag, new_etag)
+      end
+
+      if enclosure.is_changed?(entry[:enclosure])
+        self.enclosure.destroy if enclosure
+        self.enclosure = nil
+      end
     end
+
     if entry[:enclosure]
       self.enclosure ||= Enclosure.build_from_enclosure(self, entry[:enclosure])
     end
@@ -112,14 +119,21 @@ class FeedEntry < ActiveRecord::Base
 
       entry[:media_contents].each_with_index do |c, i|
         existing_content = self.contents[i]
+
         if existing_content
-          if existing_content.url == c.url
-            existing_content.update_with_content!(c)
-          else
+          new_etag = existing_content.get_media_etag(existing_content.url)
+          if existing_content.etag.blank? && new_etag
+            existing_content.update_attribute(:etag, new_etag)
+          end
+
+          if existing_content.is_changed?(c)
             to_destroy << existing_content
             existing_content = nil
+          else
+            existing_content.update_with_content!(c)
           end
         end
+
         if !existing_content
           new_content = Content.build_from_content(self, c)
           new_content.position = i + 1

@@ -15,30 +15,7 @@ class Enclosure < MediaResource
     self.file_size = enclosure.length.to_i
     self.mime_type = enclosure.type
     self.url       = enclosure.url
-    self.etag      = get_media_etag(enclosure)
+    self.etag      = get_media_etag(enclosure.url)
     self
-  end
-
-  def differs_from?(enclosure)
-    ( !enclosure ||
-      (self.url != enclosure.url) ||
-      (self.etag != get_media_etag(enclosure))
-    )
-  end
-
-  def get_media_etag(enclosure)
-    # Send a HEAD request following redirects to the enclosure URL.
-    # Note that there may not be an etag header, which is OK.
-    conn = Faraday.new(enclosure.url) do |client|
-      client.headers[:user_agent] = "PRX Crier FeedValidator/#{ENV['CRIER_VERSION']}"
-      client.adapter :excon
-      client.use FaradayMiddleware::FollowRedirects
-    end
-    etag = conn.head[:etag]
-    if !etag.empty?
-      etag
-    else
-      nil
-    end
   end
 end
