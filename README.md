@@ -1,8 +1,6 @@
 # Crier
 [![License](https://img.shields.io/badge/license-AGPL-blue.svg)](https://www.gnu.org/licenses/agpl-3.0.html)
-[![Build Status](https://travis-ci.org/PRX/crier.prx.org.svg)](https://travis-ci.org/PRX/crier.prx.org)
 [![Code Climate](https://codeclimate.com/github/PRX/crier.prx.org/badges/gpa.svg)](https://codeclimate.com/github/PRX/crier.prx.org)
-[![Coverage Status](https://coveralls.io/repos/PRX/crier.prx.org/badge.svg)](https://coveralls.io/r/PRX/crier.prx.org)
 [![Dependency Status](https://gemnasium.com/PRX/crier.prx.org.svg)](https://gemnasium.com/PRX/crier.prx.org)
 
 ## Description
