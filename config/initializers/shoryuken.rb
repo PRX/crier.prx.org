@@ -1,3 +1,4 @@
+require 'newrelic_rpm'
 require 'shoryuken'
 require 'shoryuken/extensions/active_job_adapter'
 

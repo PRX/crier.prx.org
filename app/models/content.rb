@@ -23,6 +23,7 @@ class Content < MediaResource
     self.mime_type    = content.type
     self.file_size    = content.file_size.to_i
     self.is_default   = content.is_default && content.is_default.downcase == 'true'
+    self.etag         = get_media_etag(content.url)
     self
   end
 end

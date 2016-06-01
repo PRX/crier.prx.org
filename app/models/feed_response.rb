@@ -37,7 +37,7 @@ class FeedResponse < ActiveRecord::Base
       f.now
       f.url           = f.url.to_s
       f.etag          = f.headers['ETag']
-      f.last_modified = Time.httpdate(f.headers['Last-Modified']) if f.headers['Last-Modified']
+      f.last_modified = httpdate(f.headers['Last-Modified'])
       f.fix_max_age
     end
   end
@@ -85,7 +85,7 @@ class FeedResponse < ActiveRecord::Base
   #
   # Returns the Time object.
   def date
-    Time.httpdate(headers['Date'])
+    httpdate(headers['Date'])
   end
 
   # Internal: Gets the response max age.
@@ -131,7 +131,7 @@ class FeedResponse < ActiveRecord::Base
   #
   # Returns the Time object, or nil if the header isn't present.
   def expires
-    headers['Expires'] && Time.httpdate(headers['Expires'])
+    headers['Expires'] && httpdate(headers['Expires'])
   end
 
   # Internal: Gets the 'CacheControl' object.
@@ -153,5 +153,14 @@ class FeedResponse < ActiveRecord::Base
       headers.delete('Age')
       headers['Cache-Control'] = cache_control.to_s
     end
+  end
+
+  def self.httpdate(date)
+    return nil if date.blank?
+    Time.httpdate(date) rescue nil
+  end
+
+  def httpdate(date)
+    self.class.httpdate(date)
   end
 end

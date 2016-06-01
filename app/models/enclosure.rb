@@ -15,6 +15,7 @@ class Enclosure < MediaResource
     self.file_size = enclosure.length.to_i
     self.mime_type = enclosure.type
     self.url       = enclosure.url
+    self.etag      = get_media_etag(enclosure.url)
     self
   end
 end

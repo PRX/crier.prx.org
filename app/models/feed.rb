@@ -175,7 +175,9 @@ class Feed < ActiveRecord::Base
 
   def connection
     conn_uri = "#{uri.scheme}://#{uri.host}:#{uri.port}"
-    client ||= Faraday.new(conn_uri) { |stack| stack.adapter :excon }
+    client ||= Faraday.new(conn_uri) { |stack| stack.adapter :excon }.tap do |c|
+      c.headers[:user_agent] = "PRX Crier FeedValidator/#{ENV['CRIER_VERSION']}"
+    end
   end
 
   def last_successful_response
