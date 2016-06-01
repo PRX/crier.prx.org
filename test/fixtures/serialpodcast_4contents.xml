@@ -1,0 +1,46 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<rss version="2.0" xml:base="http://serialpodcast.org" xmlns:dc="http://purl.org/dc/elements/1.1/" xmlns:feedburner="http://rssnamespace.org/feedburner/ext/1.0" xmlns:itunes="http://www.itunes.com/dtds/podcast-1.0.dtd" xmlns:media="http://search.yahoo.com/mrss/">
+  <channel>
+    <title>Serial</title>
+    <link>http://serialpodcast.org</link>
+    <description>Serial is a new podcast from the creators of This American Life, hosted by Sarah Koenig. Serial unfolds one story - a true story - over the course of a whole season. The show follows the plot and characters wherever they lead, through
+      many surprising twists and turns. Sarah won't know what happens at the end of the story until she gets there, not long before you get there with her. Each week she'll bring you the latest chapter, so it's important to listen in, starting with Episode
+      1. New episodes are released on Thursday mornings.</description>
+    <language>en</language>
+    <copyright>Copyright 2015 Ira Glass</copyright>
+    <itunes:author>This American Life</itunes:author>
+    <itunes:subtitle>A new podcast from the creators of This American Life</itunes:subtitle>
+    <itunes:owner>
+      <itunes:email>rich@strangebirdlabs.com</itunes:email>
+    </itunes:owner>
+    <itunes:category text="News &amp; Politics"/>
+    <itunes:image href="http://serialpodcast.org/sites/all/modules/custom/serial/img/serial-itunes-logo.png"/>
+    <atom10:link href="http://feeds.serialpodcast.org/serialpodcast" rel="self" type="application/rss+xml" xmlns:atom10="http://www.w3.org/2005/Atom"/><feedburner:info uri="serialpodcast"/><atom10:link href="http://pubsubhubbub.appspot.com/" rel="hub" xmlns:atom10="http://www.w3.org/2005/Atom"/>
+    <item>
+      <title>Episode 12: What We Know</title>
+      <link>http://feeds.serialpodcast.org/~r/serialpodcast/~3/_LnOrNUV5n4/</link>
+      <description>On January 13, 1999, Adnan Syed was a hurt and vengeful ex-boyfriend who carried out a premeditated murder. Or he was a bewildered bystander, framed for a crime he could never have committed. After 15 months of reporting, we take out
+        everything we’ve got - interviews and documents and police reports - we shake it all out, and we see what sticks.&lt;img src="http://feeds.feedburner.com/~r/serialpodcast/~4/_LnOrNUV5n4" height="1" width="1" alt=""/&gt;</description>
+      <pubDate>Thu, 18 Dec 2014 10:30:00 +0000</pubDate>
+      <dc:creator>Dana</dc:creator>
+      <guid isPermaLink="false">57 at http://serialpodcast.org</guid>
+      <itunes:author>This American Life</itunes:author>
+      <itunes:order>12</itunes:order>
+      <itunes:duration>3360</itunes:duration>
+      <enclosure length="27485957" type="audio/mpeg" url="http://dts.podtrac.com/redirect.mp3/files.serialpodcast.org/sites/default/files/podcast/1445350094/serial-s01-e12.mp3"/>
+      <itunes:subtitle>On January 13, 1999, Adnan Syed was a hurt and vengeful ex-boyfriend who carried out a premeditated murder. Or he was a bewildered bystander, framed for a crime he could never have committed. After 15 months of reporting, we take out
+        everything we’ve got - interviews and documents and police reports - we shake it all out, and we see what sticks.</itunes:subtitle>
+      <itunes:summary>On January 13, 1999, Adnan Syed was a hurt and vengeful ex-boyfriend who carried out a premeditated murder. Or he was a bewildered bystander, framed for a crime he could never have committed. After 15 months of reporting, we take out
+        everything we’ve got - interviews and documents and police reports - we shake it all out, and we see what sticks.</itunes:summary>
+      <feedburner:origLink>http://serialpodcast.org</feedburner:origLink>
+      <media:content bitrate="64" channels="1" duration="3252.19" expression="sample" fileSize="26017749" lang="en" medium="audio" samplingrate="44.1" type="audio/mpeg"
+        url="https://s3.amazonaws.com/prx-dovetail/testserial/serial_audio.mp3"/>
+      <media:content bitrate="64" channels="1" duration="20.27" expression="sample" fileSize="162376" lang="en" medium="audio" samplingrate="44.1" type="audio/mpeg"
+        url="https://s3.amazonaws.com/prx-dovetail/testserial/serial_credits.mp3"/>
+      <media:content bitrate="64" channels="1" duration="3252.19" expression="sample" fileSize="26017749" lang="en" medium="audio" samplingrate="44.1" type="audio/mpeg"
+        url="https://s3.amazonaws.com/prx-dovetail/testserial/serial_audio1.mp3"/>
+      <media:content bitrate="64" channels="1" duration="20.27" expression="sample" fileSize="162376" lang="en" medium="audio" samplingrate="44.1" type="audio/mpeg"
+        url="https://s3.amazonaws.com/prx-dovetail/testserial/serial_credits1.mp3"/>
+    </item>
+  </channel>
+</rss>

@@ -4,7 +4,7 @@ eval $(/usr/local/bin/docker-machine env default --shell=bash)
 VERSION=`cat VERSION`
 
 _clean() {
-  docker rmi crier_worker
+  docker rmi crierprxorg_worker
 }
 
 _build() {
@@ -16,8 +16,8 @@ _up() {
 }
 
 _tag() {
-  docker tag -f crier_worker publicradioexchange/crier_worker:$VERSION
-  docker tag -f crier_worker publicradioexchange/crier_worker:latest
+  docker tag -f crierprxorg_worker publicradioexchange/crier_worker:$VERSION
+  docker tag -f crierprxorg_worker publicradioexchange/crier_worker:latest
 }
 
 _push() {

@@ -2,15 +2,30 @@ require 'object_digest'
 require 'addressable/uri'
 
 class Feed < ActiveRecord::Base
+  acts_as_paranoid
+
   has_many :responses, class_name: 'FeedResponse'
   has_many :entries, class_name: 'FeedEntry'
 
   serialize :options, JSON
   serialize :categories, JSON
   serialize :keywords, JSON
-  serialize :owners, JSON
 
+  serialize :owners, JSON
+  serialize :author, JSON
+  serialize :web_master, JSON
+  serialize :managing_editor, JSON
+
+  after_create :schedule_sync
   after_commit :feed_updated
+
+  def schedule_sync
+    SyncFeedJob.set(wait: sync_interval).perform_later(self, true)
+  end
+
+  def sync_interval
+    10.minutes
+  end
 
   def feed_updated
   end
@@ -18,11 +33,11 @@ class Feed < ActiveRecord::Base
   def sync(force=false)
     return unless response = updated_response(force)
 
-    feed = Feedjira::Feed.parse(response.body)
-    update_feed(feed)
-
-    feed.entries.each do |entry|
-      insert_or_update_entry(entry)
+    with_lock do
+      feed = Feedjira::Feed.parse(response.body)
+      update_feed!(feed)
+      keepers = feed.entries.map { |e| insert_or_update_entry(e).id }
+      entries.where('id not in (?)', keepers).each {|e| e.destroy }
     end
   end
 
@@ -39,51 +54,54 @@ class Feed < ActiveRecord::Base
     (ikey + mkey).compact.uniq
   end
 
-  def update_feed(feed)
+  def update_feed!(feed)
     %w( copyright description feedburner_name generator language last_built
-      last_modified managing_editor pub_date published title ttl
+      last_modified pub_date published title ttl
       update_frequency update_period url web_master
     ).each do |at|
       self.try("#{at}=", feed.try(at))
     end
 
-    { itunes_author: :author, itunes_image: :image_url,
+    { itunes_image: :image_url,
       itunes_subtitle: :subtitle, itunes_summary: :summary,
       itunes_new_feed_url: :new_feed_url
     }.each do |k,v|
       self.try("#{v}=", feed.try(k))
     end
 
-    self.block      = (feed.itunes_block == 'yes')
+    self.web_master = feed.web_master ? Person.new(feed.web_master) : nil
+    self.managing_editor = feed.managing_editor ? Person.new(feed.managing_editor) : nil
+    self.author = feed.itunes_author ? Person.new(feed.itunes_author) : nil
+    self.owners = Array(feed.itunes_owners).map { |o| Person.new(name: o.name, email: o.email) }
+
+    self.block = (feed.itunes_block == 'yes')
     self.categories = parse_categories(feed)
-    self.complete   = (feed.itunes_complete == 'yes')
-    self.copyright  ||= feed.media_copyright
-    self.explicit   = (feed.itunes_explicit && feed.itunes_explicit != 'no')
-    self.hub_url    = Array(feed.hubs).first
-    self.thumb_url  = feed.image.try(:url)
-    self.keywords   = parse_keywords(feed)
-    self.owners     = (feed.itunes_owners || []).collect { |o|
-      { name: o.name, email: o.email }
-    }
+    self.complete = (feed.itunes_complete == 'yes')
+    self.copyright ||= feed.media_copyright
+    self.explicit = (feed.itunes_explicit && feed.itunes_explicit != 'no')
+    self.hub_url = Array(feed.hubs).first
+    self.keywords = parse_keywords(feed)
+    self.thumb_url = feed.image.try(:url)
 
     save!
   end
 
   def insert_or_update_entry(entry)
     if current = find_entry(entry)
-      current.update_with_entry(entry)
+      current.update_with_entry!(entry)
     else
-      FeedEntry.create_with_entry(self, entry)
+      current = FeedEntry.create_with_entry!(self, entry)
     end
+    current
   end
 
   def find_entry(entry)
     if !entry.entry_id.blank?
-      entries.where(entry_id: entry.entry_id)
+      entries.with_deleted.where(entry_id: entry.entry_id)
     elsif !entry.url.blank?
-      entries.where(url: entry.url)
+      entries.with_deleted.where(url: entry.url)
     else
-      entries.where(digest: FeedEntry.entry_digest(entry))
+      entries.with_deleted.where(digest: FeedEntry.entry_digest(entry))
     end.first
   end
 
@@ -137,7 +155,10 @@ class Feed < ActiveRecord::Base
   end
 
   def connection
-    client = Faraday.new("#{uri.scheme}://#{uri.host}:#{uri.port}") {|stack| stack.adapter :excon }
+    conn_uri = "#{uri.scheme}://#{uri.host}:#{uri.port}"
+    client ||= Faraday.new(conn_uri) { |stack| stack.adapter :excon }.tap do |c|
+      c.headers[:user_agent] = "PRX Crier FeedValidator/#{ENV['CRIER_VERSION']}"
+    end
   end
 
   def last_successful_response

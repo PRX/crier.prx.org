@@ -1,5 +1,8 @@
 class FeedResponse < ActiveRecord::Base
 
+  KEEP_GOOD = 3
+  KEEP = 3
+
   # Internal: List of status codes that can be cached:
   # * 200 - 'OK'
   # * 203 - 'Non-Authoritative Information'
@@ -8,7 +11,7 @@ class FeedResponse < ActiveRecord::Base
   # * 302 - 'Found'
   # * 404 - 'Not Found'
   # * 410 - 'Gone'
-  CACHEABLE_STATUS_CODES = [200, 203, 300, 301, 302, 404, 410]
+  # CACHEABLE_STATUS_CODES = [200, 203, 300, 301, 302, 404, 410]
 
   before_validation :fix_max_age
 
@@ -20,18 +23,27 @@ class FeedResponse < ActiveRecord::Base
   serialize :request_headers, JSON
   serialize :response_headers, JSON
 
+  after_commit :delete_old_responses, on: :create
+
+  def delete_old_responses
+    old_good = FeedResponse.where(feed_id: feed_id, status: '200').order('created_at desc').offset(KEEP_GOOD).pluck(:id)
+    old = FeedResponse.where(feed_id: feed_id).where('status != \'200\'').order('created_at desc').offset(KEEP).pluck(:id)
+    for_delete = old_good + old
+    FeedResponse.delete(for_delete) if for_delete.size > 0
+  end
+
   def self.for_response(response)
     self.new(response.to_hash.slice(*FARADAY_RESPONSE_ATTRIBUTES)).tap do |f|
       f.now
       f.url           = f.url.to_s
       f.etag          = f.headers['ETag']
-      f.last_modified = Time.httpdate(f.headers['Last-Modified']) if f.headers['Last-Modified']
+      f.last_modified = httpdate(f.headers['Last-Modified'])
       f.fix_max_age
     end
   end
 
   def headers
-    self.response_headers
+    response_headers
   end
 
   def now
@@ -73,7 +85,7 @@ class FeedResponse < ActiveRecord::Base
   #
   # Returns the Time object.
   def date
-    Time.httpdate(headers['Date'])
+    httpdate(headers['Date'])
   end
 
   # Internal: Gets the response max age.
@@ -119,7 +131,7 @@ class FeedResponse < ActiveRecord::Base
   #
   # Returns the Time object, or nil if the header isn't present.
   def expires
-    headers['Expires'] && Time.httpdate(headers['Expires'])
+    headers['Expires'] && httpdate(headers['Expires'])
   end
 
   # Internal: Gets the 'CacheControl' object.
@@ -143,4 +155,12 @@ class FeedResponse < ActiveRecord::Base
     end
   end
 
+  def self.httpdate(date)
+    return nil if date.blank?
+    Time.httpdate(date) rescue nil
+  end
+
+  def httpdate(date)
+    self.class.httpdate(date)
+  end
 end

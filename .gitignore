@@ -7,22 +7,21 @@
 # Ignore bundler config.
 /.bundle
 
+# Ignore local bundle.
+/vendor/bundle
+
+# Ignore the default SQLite database.
+/db/*.sqlite3
+/db/*.sqlite3-journal
+
 # Ignore all logfiles and tempfiles.
-/log/*
-!/log/.keep
+/log/*.log
 /tmp
 
-/public/system
-/coverage/
-/test/tmp
+# Ignore compiled asset files
+/public/assets
 
 .env*
 
-# if using bower-rails ignore default bower_components path bower.json files
-/vendor/assets/bower_components
-*.bowerrc
-bower.json
-
-.DS_Store
-
-.env*
+coverage
+notes*

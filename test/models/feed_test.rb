@@ -2,18 +2,17 @@ require 'test_helper'
 
 describe Feed do
 
-  let(:feed) { Feed.create!(feed_url: 'http://feeds.99percentinvisible.org/99percentinvisible') }
-
-  let(:feed_response) { FeedResponse.create!(url: 'http://feeds.99percentinvisible.org/99percentinvisible', status: 200, feed_id: feed.id) }
+  let(:feed) { create(:feed) }
+  let(:feed_response) { create(:feed_response) }
 
   describe 'entries and updates' do
 
-    let (:feed_entry) { FeedEntry.create!(entry_id: 'thisisnotarealentryid', feed_id: feed.id) }
+    let (:feed_entry) { create(:feed_entry) }
 
     it 'can find an existing entry by entry_id' do
       entry = OpenStruct.new
       entry.entry_id = feed_entry.entry_id
-      feed.find_entry(entry).wont_be_nil
+      feed_entry.feed.find_entry(entry).wont_be_nil
     end
   end
 
@@ -94,10 +93,16 @@ describe Feed do
     conn.url_prefix.to_s.must_equal 'http://feeds.99percentinvisible.org/'
   end
 
+  it 'sets a custom user agent' do
+    conn = feed.connection
+    conn.headers['User-Agent'].wont_match /Faraday/
+    conn.headers['User-Agent'].must_match /^PRX Crier/
+  end
+
   it 'can get last successful response' do
     response = feed_response
     response.wont_be_nil
+    feed = feed_response.feed
     feed.last_successful_response.must_equal response
   end
-
 end

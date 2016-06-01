@@ -4,9 +4,12 @@ class FeedEntry < ActiveRecord::Base
   acts_as_paranoid
 
   belongs_to :feed
+  has_many :contents, -> { order("position ASC") }, dependent: :destroy
+  has_one :enclosure
 
   serialize :categories, JSON
   serialize :keywords, JSON
+  serialize :author, JSON
 
   after_commit :feed_entry_created, on: :create
   after_commit :feed_entry_updated, on: :update
@@ -25,14 +28,15 @@ class FeedEntry < ActiveRecord::Base
   end
 
   def announce_entry(action)
-    entry = FeedEntryRepresenter.new(self).to_json
+    entry = Api::FeedEntryRepresenter.new(self).to_json
     announce(:feed_entry, action, entry)
   end
 
-  def self.create_with_entry(feed, entry)
-    entry = new.update_feed_entry(entry)
-    entry.feed = feed
-    entry.save
+  def self.create_with_entry!(feed, entry)
+    new.tap do |fe|
+      fe.feed = feed
+      fe.update_attributes_with_entry!(entry)
+    end
   end
 
   def self.entry_digest(entry)
@@ -43,20 +47,23 @@ class FeedEntry < ActiveRecord::Base
     digest != FeedEntry.entry_digest(entry)
   end
 
-  def update_with_entry(entry)
-    return unless is_changed?(entry)
-    update_feed_entry(entry)
-    save
+  def update_with_entry!(entry)
+    restore if deleted?
+    if is_changed?(entry)
+      with_lock do
+        update_attributes_with_entry!(entry)
+      end
+    end
   end
 
-  def update_feed_entry(entry)
+  def update_attributes_with_entry!(entry)
     self.digest = FeedEntry.entry_digest(entry)
 
     %w( categories comment_count comment_rss_url comment_url content description
-      entry_id feedburner_orig_enclosure_link feedburner_orig_link published
-      title updated url
+      entry_id feedburner_orig_enclosure_link feedburner_orig_link is_perma_link
+      published title updated url
     ).each do |at|
-      self.try("#{at}=", entry[at.to_sym])
+      self.try("#{at}=", entry[at])
     end
 
     { itunes_explicit: :explicit, itunes_image: :image_url,
@@ -66,24 +73,80 @@ class FeedEntry < ActiveRecord::Base
       self.try("#{v}=", entry[k])
     end
 
-    self.author              = entry[:itunes_author] || entry[:author] || entry[:creator]
     self.block               = (entry[:itunes_block] == 'yes')
     self.duration            = seconds_for_duration(entry[:itunes_duration] || entry[:duration])
     self.is_closed_captioned = (entry[:itunes_is_closed_captioned] == 'yes')
     self.keywords            = (entry[:itunes_keywords] || '').split(',').map(&:strip)
 
-    # TODO: do something with media_groups/media_contents if no enclosure
-    if entry[:enclosure]
-      self.enclosure_length = entry[:enclosure].length
-      self.enclosure_type   = entry[:enclosure].type
-      self.enclosure_url    = entry[:enclosure].url
-    end
+    author_attr = entry[:itunes_author] || entry[:author] || entry[:creator]
+    self.author = Person.new(author_attr) if author_attr
 
+    update_enclosure(entry)
+    update_contents(entry)
+    save!
     self
   end
 
+  def update_enclosure(entry)
+    if enclosure
+      new_etag = enclosure.get_media_etag(enclosure.url)
+      if enclosure.etag.blank? && new_etag
+        enclosure.update_attribute(:etag, new_etag)
+      end
+
+      if enclosure.is_changed?(entry[:enclosure])
+        self.enclosure.destroy if enclosure
+        self.enclosure = nil
+      end
+    end
+
+    if entry[:enclosure]
+      self.enclosure ||= Enclosure.build_from_enclosure(self, entry[:enclosure])
+    end
+    enclosure
+  end
+
+  def update_contents(entry)
+    if entry[:media_contents].blank?
+      contents.destroy_all
+    else
+      to_insert = []
+      to_destroy = []
+
+      if contents.size > entry[:media_contents].size
+        to_destroy = contents[entry[:media_contents].size..(contents.size - 1)]
+      end
+
+      entry[:media_contents].each_with_index do |c, i|
+        existing_content = self.contents[i]
+
+        if existing_content
+          new_etag = existing_content.get_media_etag(existing_content.url)
+          if existing_content.etag.blank? && new_etag
+            existing_content.update_attribute(:etag, new_etag)
+          end
+
+          if existing_content.is_changed?(c)
+            to_destroy << existing_content
+            existing_content = nil
+          else
+            existing_content.update_with_content!(c)
+          end
+        end
+
+        if !existing_content
+          new_content = Content.build_from_content(self, c)
+          new_content.position = i + 1
+          to_insert << new_content
+        end
+      end
+      self.contents.destroy(to_destroy)
+      to_insert.each{|c| contents << c}
+    end
+  end
+
   def seconds_for_duration(duration)
-    duration.split(':').reverse.inject([0,0]) do |info, i|
+    (duration  || '').split(':').reverse.inject([0,0]) do |info, i|
       sum = (i.to_i * 60**info[0]) + info[1]
       [(info[0]+1), sum]
     end[1]

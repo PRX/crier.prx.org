@@ -11,7 +11,7 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema.define(version: 20151007211158) do
+ActiveRecord::Schema.define(version: 20160425140442) do
 
   # These are extensions that must be enabled in order to support this database
   enable_extension "plpgsql"
@@ -29,9 +29,6 @@ ActiveRecord::Schema.define(version: 20151007211158) do
     t.datetime "published"
     t.datetime "updated"
     t.string   "image_url"
-    t.string   "enclosure_length"
-    t.string   "enclosure_type"
-    t.string   "enclosure_url"
     t.integer  "duration"
     t.string   "explicit"
     t.text     "keywords"
@@ -103,7 +100,35 @@ ActiveRecord::Schema.define(version: 20151007211158) do
     t.datetime "last_modified"
     t.datetime "pub_date"
     t.string   "thumb_url"
+    t.datetime "deleted_at"
   end
+
+  add_index "feeds", ["deleted_at"], name: "index_feeds_on_deleted_at", using: :btree
+
+  create_table "media_resources", force: :cascade do |t|
+    t.string   "type"
+    t.integer  "feed_entry_id"
+    t.string   "url"
+    t.string   "mime_type"
+    t.integer  "file_size"
+    t.boolean  "is_default"
+    t.string   "medium"
+    t.string   "expression"
+    t.integer  "bitrate"
+    t.integer  "framerate"
+    t.decimal  "samplingrate"
+    t.integer  "channels"
+    t.decimal  "duration"
+    t.integer  "height"
+    t.integer  "width"
+    t.string   "lang"
+    t.datetime "created_at",    null: false
+    t.datetime "updated_at",    null: false
+    t.integer  "position"
+    t.string   "etag"
+  end
+
+  add_index "media_resources", ["feed_entry_id"], name: "index_media_resources_on_feed_entry_id", using: :btree
 
   create_table "say_when_job_executions", force: :cascade do |t|
     t.integer  "job_id"
