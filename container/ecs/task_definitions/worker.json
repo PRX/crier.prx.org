@@ -1,0 +1,25 @@
+{
+  "family": "$BASE_NAME-worker-${ENV:-staging}",
+  "containerDefinitions": [{
+    "name": "$BASE_NAME-worker",
+    "image": "$REPO_STRING",
+    "cpu": $CPU,
+    "memory": $MEMORY,
+    "links": [],
+    "portMappings": [],
+    "essential": true,
+    "entryPoint": [],
+    "command": ["worker"],
+    "environment": $ENV_JSON,
+    "mountPoints": [],
+    "volumesFrom": [],
+    "logConfiguration": {
+      "logDriver": "awslogs",
+      "options": {
+        "awslogs-group": "ecs-$BASE_NAME-web-${ENV:-staging}",
+        "awslogs-region": "$AWS_DEFAULT_REGION"
+      }
+    }
+  }],
+  "volumes": []
+}
