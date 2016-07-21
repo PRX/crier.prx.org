@@ -62,7 +62,7 @@ class Feed < ActiveRecord::Base
       self.try("#{at}=", feed.try(at))
     end
 
-    { itunes_image: :image_url,
+    { itunes_explicit: :explicit, itunes_image: :image_url,
       itunes_subtitle: :subtitle, itunes_summary: :summary,
       itunes_new_feed_url: :new_feed_url
     }.each do |k,v|
@@ -78,7 +78,6 @@ class Feed < ActiveRecord::Base
     self.categories = parse_categories(feed)
     self.complete = (feed.itunes_complete == 'yes')
     self.copyright ||= feed.media_copyright
-    self.explicit = (feed.itunes_explicit && feed.itunes_explicit != 'no')
     self.hub_url = Array(feed.hubs).first
     self.keywords = parse_keywords(feed)
     self.thumb_url = feed.image.try(:url)
