@@ -13,16 +13,20 @@ ApplicationParseOpts () {
   CMD_ARGS=$*
 }
 
+ApplicationUpdate () {
+  bundle exec rake -vt sqs:create announce:configure_broker db:create db:migrate
+}
+
 ApplicationRun () {
   CMD=
   if [ "$PROCESS" = "help" ] ; then
     ApplicationUsage
     exit
   elif [ "$PROCESS" = "web" ] ; then
-    bundle exec rake -vt announce:configure_broker sqs:create db:create db:migrate
+    ApplicationUpdate
     CMD="bundle exec puma -C config/puma.rb"
   elif [ "$PROCESS" = "worker" ] ; then
-    bundle exec rake -vt announce:configure_broker sqs:create db:create db:migrate
+    ApplicationUpdate
     CMD="bundle exec shoryuken --verbose --rails --config config/shoryuken.yml"
   elif [ "$PROCESS" = "test" ] ; then
     CMD="bundle exec rake db:create test RAILS_ENV=test"
@@ -33,7 +37,7 @@ ApplicationRun () {
   elif [ "$PROCESS" = "migrate" ] ; then
     CMD="bundle exec rake -vt db:create db:migrate"
   elif [ "$PROCESS" = "sqs" ] ; then
-    CMD="bundle exec rake -vt announce:configure_broker sqs:create"
+    CMD="bundle exec rake -vt sqs:create announce:configure_broker"
   elif [ "$PROCESS" = "rails" ] ; then
     CMD="bundle exec rails"
   elif [ "$PROCESS" = "--" ] ; then
