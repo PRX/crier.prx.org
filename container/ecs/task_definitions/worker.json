@@ -16,7 +16,7 @@
     "logConfiguration": {
       "logDriver": "awslogs",
       "options": {
-        "awslogs-group": "ecs-$BASE_NAME-web-${ENV:-staging}",
+        "awslogs-group": "ecs-$BASE_NAME-worker-${ENV:-staging}",
         "awslogs-region": "$AWS_DEFAULT_REGION"
       }
     }
