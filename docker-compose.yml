@@ -1,4 +1,4 @@
-app:
+crier:
   build: .
   volumes:
     - .:/app

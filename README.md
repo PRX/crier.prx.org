@@ -54,16 +54,16 @@ docker-compose start db
 
 # ... and run migrations against it
 docker-compose up db # the database has to be running
-docker-compose run app migrate
+docker-compose run crier migrate
 
 # Create SQS (and SNS) configuration
-docker-compose run app sqs
+docker-compose run crier sqs
 
 # Test
-docker-compose run app test
+docker-compose run crier test
 
 # Guard
-docker-compose run app guard
+docker-compose run crier guard
 
 # Run the web, worker, and db
 docker-compose up
