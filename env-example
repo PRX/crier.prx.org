@@ -15,3 +15,5 @@ SECRET_KEY_BASE=thisisnotasecret
 SECRET_TOKEN=thisisnotasecret
 
 NEW_RELIC_KEY=
+
+RAILS_ENV=development
