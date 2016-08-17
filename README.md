@@ -65,6 +65,9 @@ docker-compose run crier test
 # Guard
 docker-compose run crier guard
 
+# Console
+docker-compose run crier console
+
 # Run the web, worker, and db
 docker-compose up
 ```
