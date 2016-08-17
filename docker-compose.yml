@@ -12,7 +12,7 @@ crier:
   environment:
     VIRTUAL_HOST: crier.prx.docker
 worker:
-  image: crierprxorg_app
+  image: crierprxorg_crier
   volumes:
     - .:/app
   env_file:
