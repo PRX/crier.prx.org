@@ -25,6 +25,8 @@ ApplicationRun () {
   elif [ "$PROCESS" = "web" ] ; then
     ApplicationUpdate
     CMD="bundle exec puma -C config/puma.rb"
+  elif [ "$PROCESS" = "console" ] ; then
+    CMD="bundle exec rails console"
   elif [ "$PROCESS" = "worker" ] ; then
     ApplicationUpdate
     CMD="bundle exec shoryuken --verbose --rails --config config/shoryuken.yml"
