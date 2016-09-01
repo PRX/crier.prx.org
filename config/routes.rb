@@ -15,5 +15,8 @@ Rails.application.routes.draw do
     end
   end
 
+  match '/api', via: [:get], to: redirect("/api/v1")
+  match '/', via: [:get], to: redirect("/api/v1")
+
   mount Ping, at: 'ping'
 end
