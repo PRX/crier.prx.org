@@ -13,7 +13,7 @@ class Ping
     feed = Feed.find_by_url(url) || Feed.find_by_feed_url(url)
 
     if feed
-      SyncFeedJob.perform_later(feed.id)
+      SyncFeedJob.perform_later(feed)
       { flerror: false, message: 'Ok'}
     else
       { flerror: true, message: 'Unknown feed'}
@@ -23,7 +23,7 @@ class Ping
   def extendedPing(title, url, changed_url, feed_url, tags)
     feed = Feed.find_by_url(url) || Feed.find_by_feed_url(feed_url)
     if feed
-      SyncFeedJob.perform_later(feed.id)
+      SyncFeedJob.perform_later(feed)
       { flerror: false, message: 'Ok'}
     else
       { flerror: true, message: 'Unknown feed'}
