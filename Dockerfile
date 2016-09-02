@@ -1,4 +1,4 @@
-FROM alpine:3.2
+FROM alpine:3.4
 
 MAINTAINER PRX <sysadmin@prx.org>
 
@@ -17,8 +17,8 @@ WORKDIR $APP_HOME
 ADD Gemfile ./
 ADD Gemfile.lock ./
 
-RUN apk --update add --virtual build-dependencies build-base ruby-dev openssl-dev \
-    postgresql-dev zlib-dev libxml2-dev libxslt-dev libffi-dev && \
+RUN apk --update add --virtual build-dependencies build-base curl-dev ruby-dev openssl-dev \
+    postgresql-dev zlib-dev libxml2-dev libxslt-dev libffi-dev libgcrypt-dev && \
     gem install -N bundler && \
     cd $APP_HOME ; \
     bundle config --global build.nokogiri  "--use-system-libraries" && \
