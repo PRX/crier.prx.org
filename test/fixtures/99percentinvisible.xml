@@ -3,14 +3,14 @@
 
 <channel>
 	<title>99% Invisible</title>
-	
+
 	<link>http://99percentinvisible.prx.org</link>
 	<description>A Tiny Radio Show about Design with Roman Mars</description>
 	<lastBuildDate>Tue, 16 Sep 2014 13:54:15 +0000</lastBuildDate>
 	<language>en-US</language>
 		<sy:updatePeriod>hourly</sy:updatePeriod>
 		<sy:updateFrequency>1</sy:updateFrequency>
-	
+
 <!-- podcast_generator="Blubrry PowerPress/5.0.9" mode="advanced" -->
 	<itunes:summary>Design is everywhere in our lives, perhaps most importantly in the places where we've just stopped noticing. 99% Invisible (99 Percent Invisible) is a weekly exploration of the process and power of design and architecture. From award winning producer Roman Mars, KALW in San Francisco, and Radiotopia from PRX. Learn more: http://99percentinvisible.org
 
@@ -31,6 +31,7 @@ Proud member of PRX's Radiotopia.</itunes:summary>
 		<itunes:name>Roman Mars</itunes:name>
 		<itunes:email>roman@prx.org</itunes:email>
 	</itunes:owner>
+	<itunes:new-feed-url>http://feeds.99percentinvisible.org/99percentinvisible</itunes:new-feed-url>
 	<managingEditor>roman@prx.org (Roman Mars)</managingEditor>
 	<copyright>Copyright © 2014 Roman Mars. All rights reserved.</copyright>
 	<itunes:subtitle>A tiny radio show about design, architecture &amp; the 99% invisible activity that shapes our world.</itunes:subtitle>
