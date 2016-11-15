@@ -16,6 +16,15 @@ describe Feed do
     end
   end
 
+  describe 'rss parsing' do
+    let (:rss) { test_file('/fixtures/99percentinvisible.xml') }
+    let (:response) { Feedjira::Feed.parse(rss) }
+
+    it 'parses the itunes new feed url' do
+      response.itunes_new_feed_url.must_equal 'http://feeds.99percentinvisible.org/99percentinvisible'
+    end
+  end
+
   describe 'http requests' do
     if use_webmock?
 

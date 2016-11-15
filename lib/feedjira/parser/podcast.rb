@@ -36,7 +36,7 @@ module Feedjira
       element :"itunes:image", value: :href, as: :itunes_image
       element :"itunes:explicit", as: :itunes_explicit
       element :"itunes:complete", as: :itunes_complete
-      element :"itunes:new-feed-url", as: :itunes_new_feed_url
+      element :"itunes:new_feed_url", as: :itunes_new_feed_url
       elements :"itunes:owner", as: :itunes_owners, class: ITunesRSSOwner
       element :"itunes:subtitle", as: :itunes_subtitle
       element :"itunes:summary", as: :itunes_summary
