@@ -1,21 +1,24 @@
-language: ruby
-rvm:
-  - 2.2.4
-services:
-  - docker
-env:
-  DOCKER_COMPOSE_VERSION: 1.4.2
-  global:
-    - RAILS_ENV=test
+# language: ruby
+# rvm:
+#   - 2.2.4
+# services:
+#   - docker
+# env:
+#   DOCKER_COMPOSE_VERSION: 1.4.2
+#   global:
+#     - RAILS_ENV=test
+# before_install:
+#   - sudo /etc/init.d/postgresql stop
+#   - sudo apt-get install docker-engine=1.11.0
+#   - sudo rm /usr/local/bin/docker-compose
+#   - curl -L https://github.com/docker/compose/releases/download/${DOCKER_COMPOSE_VERSION}/docker-compose-`uname -s`-`uname -m` > docker-compose
+#   - chmod +x docker-compose
+#   - sudo mv docker-compose /usr/local/bin
+# script:
+#   - cp env-example .env
+#   - docker-compose build
+#   # TODO: do we have to migrate, or will the test script run that for us...?
+#   - docker-compose run app test
 before_install:
-  - sudo /etc/init.d/postgresql stop
-  - sudo apt-get install docker-engine=1.11.0
-  - sudo rm /usr/local/bin/docker-compose
-  - curl -L https://github.com/docker/compose/releases/download/${DOCKER_COMPOSE_VERSION}/docker-compose-`uname -s`-`uname -m` > docker-compose
-  - chmod +x docker-compose
-  - sudo mv docker-compose /usr/local/bin
-script:
-  - cp env-example .env
-  - docker-compose build
-  # TODO: do we have to migrate, or will the test script run that for us...?
-  - docker-compose run app test
+  # list docker-engine versions
+  - apt-cache madison docker-engine
