@@ -6,6 +6,7 @@ MAINTAINER PRX <sysadmin@prx.org>
 RUN apk update && apk --update add \
     ca-certificates \
     git \
+    groff \
     less \
     libxml2 \
     libxslt \
