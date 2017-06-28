@@ -4,7 +4,7 @@ MAINTAINER PRX <sysadmin@prx.org>
 LABEL org.prx.app="yes"
 
 # install git, aws-cli
-RUN apk update && apk --update add \
+RUN apk --no-cache add \
     ca-certificates \
     git \
     groff \
@@ -51,7 +51,6 @@ RUN apk --update add --virtual build-dependencies \
     bundle install --jobs 10 --retry 10 && \
     apk del build-dependencies && \
     (find / -type f -iname \*.apk-new -delete || true) && \
-    rm -rf /var/cache/apk/* && \
     rm -rf /usr/lib/ruby/gems/*/cache/* && \
     rm -rf /tmp/* /var/tmp/* && \
     rm -rf ~/.gem
