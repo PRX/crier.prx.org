@@ -17,3 +17,4 @@ SECRET_TOKEN=thisisnotasecret
 NEW_RELIC_KEY=
 
 RAILS_ENV=development
+LOCAL_ENV=true
