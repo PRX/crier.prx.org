@@ -7,7 +7,7 @@ crier:
   command: test
   environment:
     VIRTUAL_HOST: crier.prx.docker
-    LOCAL_ENV: true
+    LOCAL_ENV: 'true'
     DB_ENV_POSTGRES_USER: crier
     DB_ENV_POSTGRES_PASSWORD: password
 db:

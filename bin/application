@@ -14,6 +14,14 @@ UpdateEnvironment () {
    fi
 }
 
+WaitForPostgres () {
+  export PGPASSWORD="$DB_ENV_POSTGRES_PASSWORD"
+  until psql -h "$DB_PORT_5432_TCP_ADDR" -p "$DB_PORT_5432_TCP_PORT" -U "$DB_ENV_POSTGRES_USER" -c '\l' &> /dev/null; do
+    >&2 echo "Postgres is unavailable - sleeping"
+    sleep 3;
+  done
+}
+
 ApplicationUsage () {
   echo "usage: application [ help | web | worker | test | guard | migrate | sqs | -- ]"
 }
@@ -29,19 +37,17 @@ ApplicationUpdate () {
 }
 
 ApplicationRun () {
-  CMD=
   if [ "$PROCESS" = "help" ] ; then
     ApplicationUsage
     exit
-  elif [ "$PROCESS" = "web" ] ; then
-    UpdateEnvironment
-    ApplicationUpdate
+  fi
+
+  CMD=
+  if [ "$PROCESS" = "web" ] ; then
     CMD="bundle exec puma -C config/puma.rb"
   elif [ "$PROCESS" = "console" ] ; then
     CMD="bundle exec rails console"
   elif [ "$PROCESS" = "worker" ] ; then
-    UpdateEnvironment
-    ApplicationUpdate
     CMD="bundle exec shoryuken --verbose --rails --config config/shoryuken.yml"
   elif [ "$PROCESS" = "test" ] ; then
     CMD="bundle exec rake db:create test RAILS_ENV=test"
@@ -50,21 +56,24 @@ ApplicationRun () {
   elif [ "$PROCESS" = "guard" ] ; then
     CMD="bundle exec guard"
   elif [ "$PROCESS" = "migrate" ] ; then
-    UpdateEnvironment
     CMD="bundle exec rake -vt db:create db:migrate"
   elif [ "$PROCESS" = "sqs" ] ; then
-    UpdateEnvironment
     CMD="bundle exec rake -vt sqs:create announce:configure_broker"
   elif [ "$PROCESS" = "rails" ] ; then
-    UpdateEnvironment
     CMD="bundle exec rails"
   elif [ "$PROCESS" = "--" ] ; then
-    UpdateEnvironment
     CMD=
   else
     echo "ERROR: $PROCESS is not a valid command."
     ApplicationUsage
     exit
+  fi
+
+  UpdateEnvironment
+  WaitForPostgres
+
+  if [ \( "$PROCESS" = "web" \) -o \( "$PROCESS" = "worker" \) ] ; then
+    ApplicationUpdate
   fi
 
   $CMD $CMD_ARGS
