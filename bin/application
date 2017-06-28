@@ -3,6 +3,25 @@
 PROCESS=
 CMD_ARGS=
 
+UpdateEnvironment () {
+   if [ -z "$LOCAL_ENV" ]; then
+     IFS=$'\n'
+     for item in `aws-secrets-get`; do
+       clean=`echo $item | sed 's/="\(.*\)"$/=\1/'`
+       export "$clean"
+     done
+     unset IFS
+   fi
+}
+
+WaitForPostgres () {
+  export PGPASSWORD="$DB_ENV_POSTGRES_PASSWORD"
+  until psql -h "$DB_PORT_5432_TCP_ADDR" -p "$DB_PORT_5432_TCP_PORT" -U "$DB_ENV_POSTGRES_USER" -c '\l' &> /dev/null; do
+    >&2 echo "Postgres is unavailable - sleeping"
+    sleep 3;
+  done
+}
+
 ApplicationUsage () {
   echo "usage: application [ help | web | worker | test | guard | migrate | sqs | -- ]"
 }
@@ -18,17 +37,17 @@ ApplicationUpdate () {
 }
 
 ApplicationRun () {
-  CMD=
   if [ "$PROCESS" = "help" ] ; then
     ApplicationUsage
     exit
-  elif [ "$PROCESS" = "web" ] ; then
-    ApplicationUpdate
+  fi
+
+  CMD=
+  if [ "$PROCESS" = "web" ] ; then
     CMD="bundle exec puma -C config/puma.rb"
   elif [ "$PROCESS" = "console" ] ; then
     CMD="bundle exec rails console"
   elif [ "$PROCESS" = "worker" ] ; then
-    ApplicationUpdate
     CMD="bundle exec shoryuken --verbose --rails --config config/shoryuken.yml"
   elif [ "$PROCESS" = "test" ] ; then
     CMD="bundle exec rake db:create test RAILS_ENV=test"
@@ -48,6 +67,13 @@ ApplicationRun () {
     echo "ERROR: $PROCESS is not a valid command."
     ApplicationUsage
     exit
+  fi
+
+  UpdateEnvironment
+  WaitForPostgres
+
+  if [ \( "$PROCESS" = "web" \) -o \( "$PROCESS" = "worker" \) ] ; then
+    ApplicationUpdate
   fi
 
   $CMD $CMD_ARGS

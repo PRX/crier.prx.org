@@ -1,16 +1,26 @@
 FROM ruby:2.3-alpine
 
 MAINTAINER PRX <sysadmin@prx.org>
+LABEL org.prx.app="yes"
 
-RUN apk update && apk --update add \
+# install git, aws-cli
+RUN apk --no-cache add \
     ca-certificates \
-    tzdata \
-    linux-headers \
+    git \
+    groff \
+    less \
     libxml2 \
     libxslt \
-    postgresql-client \
+    linux-headers \
     nodejs \
-    less
+    postgresql-client \
+    python py-pip py-setuptools \
+    tzdata \
+    && pip --no-cache-dir install awscli
+
+# install PRX aws-secrets scripts
+RUN git clone -o github https://github.com/PRX/aws-secrets
+RUN cp ./aws-secrets/bin/* /usr/local/bin
 
 ENV TINI_VERSION v0.9.0
 ADD https://github.com/krallin/tini/releases/download/${TINI_VERSION}/tini-static /tini
@@ -41,7 +51,6 @@ RUN apk --update add --virtual build-dependencies \
     bundle install --jobs 10 --retry 10 && \
     apk del build-dependencies && \
     (find / -type f -iname \*.apk-new -delete || true) && \
-    rm -rf /var/cache/apk/* && \
     rm -rf /usr/lib/ruby/gems/*/cache/* && \
     rm -rf /tmp/* /var/tmp/* && \
     rm -rf ~/.gem
