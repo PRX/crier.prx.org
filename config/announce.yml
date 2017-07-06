@@ -5,9 +5,3 @@ publish:
     - create
     - update
     - delete
-
-# subscribe:
-#   feed_entry:
-#     - create
-#     - update
-#     - delete

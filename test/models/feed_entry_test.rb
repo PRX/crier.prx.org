@@ -6,14 +6,29 @@ describe FeedEntry do
   let(:feed) { feed_entry.feed }
 
   before {
+    clear_messages
     stub_head_requests(/http:\/\/.*\.podtrac.com\/.*/)
     stub_head_requests(/https:\/\/s3\.amazonaws.com\/.*/)
   }
 
-  it 'announces changes' do
-    feed_entry.stub(:announce, true) do
-      feed_entry.announce_entry(:create)
-    end
+  it 'announces create' do
+    feed_entry.announce_entry(:create)
+    lm = last_message
+    lm['action'].must_equal :create
+    lm['subject'].must_equal :feed_entry
+    entry = JSON.parse(lm['body'])
+    entry['guid'].must_equal 'thisisnotarealentryid'
+    entry['_links']['self']['href'].must_equal "/api/v1/entries/#{feed_entry.id}"
+  end
+
+  it 'announces delete' do
+    feed_entry.destroy
+    lm = last_message
+    lm['action'].must_equal :delete
+    lm['subject'].must_equal :feed_entry
+    entry = JSON.parse(lm['body'])
+    entry['guid'].must_equal 'thisisnotarealentryid'
+    entry['_links']['self']['href'].must_equal "/api/v1/entries/#{feed_entry.id}"
   end
 
   it 'can be created from an rss entry' do

@@ -5,7 +5,10 @@ class Api::FeedRepresenter < Api::BaseRepresenter
   end
 
   link :entries do
-    api_feed_entries_path represented
+    {
+      href: api_feed_entries_path(represented),
+      count: represented.entries.count
+    }
   end
 
   property :feed_url

@@ -19,15 +19,33 @@ class Feed < ActiveRecord::Base
   after_create :schedule_sync
   after_commit :feed_updated
 
+  after_commit :feed_created, on: :create
+  after_commit :feed_updated, on: :update
+  before_destroy :feed_deleted
+
+  def feed_created
+    announce_entry(:create)
+  end
+
+  def feed_updated
+    announce_entry(:update)
+  end
+
+  def feed_deleted
+    announce_entry(:delete)
+  end
+
+  def announce_entry(action)
+    entry = Api::FeedRepresenter.new(self).to_json
+    announce(:feed, action, entry)
+  end
+
   def schedule_sync
     SyncFeedJob.set(wait: sync_interval).perform_later(self, true)
   end
 
   def sync_interval
     10.minutes
-  end
-
-  def feed_updated
   end
 
   def sync(force=false)
@@ -37,7 +55,7 @@ class Feed < ActiveRecord::Base
       feed = Feedjira::Feed.parse(response.body)
       update_feed!(feed)
       keepers = feed.entries.map { |e| insert_or_update_entry(e).id }
-      entries.where('id not in (?)', keepers).each {|e| e.destroy }
+      entries.where('id not in (?)', keepers).each { |e| e.destroy }
     end
   end
 
