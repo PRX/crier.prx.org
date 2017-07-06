@@ -2,6 +2,14 @@ require 'newrelic_rpm'
 require 'shoryuken'
 require 'shoryuken/extensions/active_job_adapter'
 
+# for older shoryuken, < 3.x, where celluloid is still used
+require 'say_when/poller/celluloid_poller'
+
+Shoryuken.on_start do
+  # check for new jobs to run every 5 seconds
+  SayWhen::Poller::CelluloidPoller.supervise as: :say_when, args: [5]
+end
+
 Shoryuken.default_worker_options =  {
   'queue'                   => "#{Rails.env}_crier_default",
   'auto_delete'             => true,
