@@ -2,6 +2,8 @@ require 'object_digest'
 require 'addressable/uri'
 
 class Feed < ActiveRecord::Base
+  include Announce::Publisher
+
   acts_as_paranoid
 
   has_many :responses, class_name: 'FeedResponse'
