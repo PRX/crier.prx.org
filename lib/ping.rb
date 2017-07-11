@@ -10,23 +10,23 @@ class Ping
   end
 
   def ping(title, url)
-    feed = Feed.find_by_url(url) || Feed.find_by_feed_url(url)
-
-    if feed
-      SyncFeedJob.perform_later(feed)
-      { flerror: false, message: 'Ok'}
-    else
-      { flerror: true, message: 'Unknown feed'}
-    end
+    ping_feed(url, url)
   end
 
   def extendedPing(title, url, changed_url, feed_url, tags)
-    feed = Feed.find_by_url(url) || Feed.find_by_feed_url(feed_url)
-    if feed
-      SyncFeedJob.perform_later(feed)
-      { flerror: false, message: 'Ok'}
+    ping_feed(url, feed_url)
+  end
+
+  def ping_feed(url, feed_url)
+    if feed = Feed.find_by_url(url) || Feed.find_by_feed_url(feed_url)
+      sync_feed(feed)
+      { flerror: false, message: 'Ok' }
     else
-      { flerror: true, message: 'Unknown feed'}
+      { flerror: true, message: 'Feed not found' }
     end
+  end
+
+  def sync_feed(feed)
+    feed.sync(force: true)
   end
 end
