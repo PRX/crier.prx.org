@@ -40,6 +40,7 @@ gem 'fastimage'
 gem 'dotenv-rails'
 gem 'shoryuken'
 gem 'announce'
+gem 'say_when', '~> 2.0'
 gem 'paranoia', '~> 2.0'
 gem 'actionpack-action_caching'
 

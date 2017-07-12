@@ -14,16 +14,16 @@ describe Ping do
   end
 
   describe 'ping methods' do
-    before(:each) {
+    before(:each) do
       feed
       clear_enqueued_jobs
-    }
+    end
 
     it 'can accept ping for an existing feed' do
-      ping.ping('99percentinvisible', feed.feed_url)[:flerror].must_equal false
-      assert_enqueued_jobs 1
-      ping.ping('99percentinvisible', feed.url)[:flerror].must_equal false
-      assert_enqueued_jobs 2
+      ping.stub(:sync_feed, true) do
+        ping.ping('99percentinvisible', feed.feed_url)[:flerror].must_equal false
+        ping.ping('99percentinvisible', feed.url)[:flerror].must_equal false
+      end
     end
 
     it 'returns error for nonexist feed ping' do
@@ -32,8 +32,9 @@ describe Ping do
     end
 
     it 'can accept extended ping for an existing feed' do
-      ping.extendedPing('99percentinvisible', feed.url, nil, feed.feed_url, nil)[:flerror].must_equal false
-      assert_enqueued_jobs 1
+      ping.stub(:sync_feed, true) do
+        ping.extendedPing('99percentinvisible', feed.url, nil, feed.feed_url, nil)[:flerror].must_equal false
+      end
     end
 
     it 'errors for extended ping of a nonexistant feed' do

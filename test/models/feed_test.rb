@@ -114,4 +114,22 @@ describe Feed do
     feed = feed_response.feed
     feed.last_successful_response.must_equal response
   end
+
+  it 'schedules a single feed sync job' do
+    feed.scheduled_jobs.count.must_equal 1
+    feed.schedule_cron('0 0/10 * * * ?', scheduled: feed, job_method: 'sync')
+    feed.schedule_cron('0 0/10 * * * ?', scheduled: feed, job_method: 'sync')
+    feed.schedule_cron('0 0/10 * * * ?', scheduled: feed, job_method: 'sync')
+    feed.scheduled_jobs.count.must_equal 4
+    feed.schedule_sync
+    feed.scheduled_jobs(true).count.must_equal 1
+  end
+
+  it 'can run the scheduled job' do
+    stub_request(:get, feed.feed_url).
+      to_return(status: 200, body: '<rss version="2.0"></rss>')
+
+    job = feed.scheduled_jobs(true).first
+    job.execute.must_equal true
+  end
 end

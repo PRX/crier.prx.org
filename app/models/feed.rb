@@ -1,7 +1,11 @@
 require 'object_digest'
 require 'addressable/uri'
+require 'say_when/storage/active_record_strategy'
 
 class Feed < ActiveRecord::Base
+  include Announce::Publisher
+
+  acts_as_scheduled
   acts_as_paranoid
 
   has_many :responses, class_name: 'FeedResponse'
@@ -19,26 +23,43 @@ class Feed < ActiveRecord::Base
   after_create :schedule_sync
   after_commit :feed_updated
 
-  def schedule_sync
-    SyncFeedJob.set(wait: sync_interval).perform_later(self, true)
-  end
+  after_commit :feed_created, on: :create
+  after_commit :feed_updated, on: :update
+  before_destroy :feed_deleted
 
-  def sync_interval
-    10.minutes
+  def feed_created
+    announce_entry(:create)
   end
 
   def feed_updated
+    announce_entry(:update)
   end
 
-  def sync(force=false)
-    return unless response = updated_response(force)
+  def feed_deleted
+    announce_entry(:delete)
+  end
+
+  def announce_entry(action)
+    entry = Api::FeedRepresenter.new(self).to_json
+    announce(:feed, action, entry)
+  end
+
+  def schedule_sync
+    scheduled_jobs.clear
+    schedule_cron('0 0/10 * * * ?', scheduled: self, job_method: 'sync')
+  end
+
+  def sync(options = nil)
+    options = {} if options.nil?
+    return false unless response = updated_response(options[:force])
 
     with_lock do
       feed = Feedjira::Feed.parse(response.body)
       update_feed!(feed)
       keepers = feed.entries.map { |e| insert_or_update_entry(e).id }
-      entries.where('id not in (?)', keepers).each {|e| e.destroy }
+      entries.where('id not in (?)', keepers).each { |e| e.destroy }
     end
+    true
   end
 
   def parse_categories(feed)
@@ -104,7 +125,7 @@ class Feed < ActiveRecord::Base
     end.first
   end
 
-  def updated_response(force=false)
+  def updated_response(force = false)
     response = nil
 
     last_response = last_successful_response
@@ -139,7 +160,7 @@ class Feed < ActiveRecord::Base
     feed_response
   end
 
-  def feed_http_response(last_response=nil)
+  def feed_http_response(last_response = nil)
     http_response = connection.get do |req|
       req.url uri.path, uri.query_values
       req.headers['If-Modified-Since'] = last_response.last_modified if last_response.try(:last_modified)

@@ -16,6 +16,7 @@ RUN apk --no-cache add \
     postgresql-client \
     python py-pip py-setuptools \
     tzdata \
+    sqlite \
     && pip --no-cache-dir install awscli
 
 # install PRX aws-secrets scripts
@@ -39,6 +40,7 @@ RUN apk --update add --virtual build-dependencies \
     openssl-dev \
     postgresql-dev \
     zlib-dev \
+    sqlite-dev \
     libxml2-dev \
     libxslt-dev \
     libffi-dev \

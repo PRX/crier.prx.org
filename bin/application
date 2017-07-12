@@ -36,6 +36,25 @@ ApplicationUpdate () {
   bundle exec rake -vt sqs:create announce:configure_broker db:create db:migrate
 }
 
+UpdateEnvironment () {
+  if [ -z "$LOCAL_ENV" ]; then
+    IFS=$'\n'
+    for item in `aws-secrets-get`; do
+      clean=`echo $item | sed 's/="\(.*\)"$/=\1/'`
+      export "$clean"
+    done
+    unset IFS
+  fi
+}
+
+WaitForPostgres () {
+  export PGPASSWORD="$DB_ENV_POSTGRES_PASSWORD"
+  until psql -h "$DB_PORT_5432_TCP_ADDR" -p "$DB_PORT_5432_TCP_PORT" -U "$DB_ENV_POSTGRES_USER" -c '\l' &> /dev/null; do
+    >&2 echo "Postgres is unavailable - sleeping"
+    sleep 3;
+  done
+}
+
 ApplicationRun () {
   if [ "$PROCESS" = "help" ] ; then
     ApplicationUsage
