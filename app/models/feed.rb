@@ -28,18 +28,18 @@ class Feed < ActiveRecord::Base
   before_destroy :feed_deleted
 
   def feed_created
-    announce_entry(:create)
+    announce_feed(:create)
   end
 
   def feed_updated
-    announce_entry(:update)
+    announce_feed(:update)
   end
 
   def feed_deleted
-    announce_entry(:delete)
+    announce_feed(:delete)
   end
 
-  def announce_entry(action)
+  def announce_feed(action)
     entry = Api::FeedRepresenter.new(self).to_json
     announce(:feed, action, entry)
   end
