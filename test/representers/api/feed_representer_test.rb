@@ -10,6 +10,6 @@ describe Api::FeedRepresenter do
   let(:json) { JSON.parse(representer.to_json) }
 
   it 'includes attributes in json' do
-    json['url'].must_equal feed.url
+    json['feedUrl'].must_equal feed.feed_url
   end
 end
