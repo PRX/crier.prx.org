@@ -5,3 +5,7 @@ publish:
     - create
     - update
     - delete
+  feed:
+    - create
+    - update
+    - delete
